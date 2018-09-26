@@ -583,18 +583,9 @@ int checkKeys(XEvent *e)
 			break;
 		//Credits
 		case XK_c:
-			/*if (gl.credits == false)
-			{
-				gl.credits = true;
-				break;
-			}
-			if (gl.credits == true)
-			{
-				gl.credits = false;
-				break;
-			}*/
 				gl.credits ^= 1; 
 			break;
+		//
 		case XK_Left:
 			break;
 		case XK_Right:
@@ -738,6 +729,19 @@ void render(void)
 	if (gl.credits) {
 		glClearColor(0.1, 0.1, 0.1, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
+	//show boxes as background
+	for (int i=0; i<20; i++) {
+		glPushMatrix();
+		glTranslated(gl.box[i][0],gl.box[i][1],gl.box[i][2]);
+		glColor3f(0.2, 0.2, 0.2);
+		glBegin(GL_QUADS);
+			glVertex2i( 0,  0);
+			glVertex2i( 0, 30);
+			glVertex2i(20, 30);
+			glVertex2i(20,  0);
+		glEnd();
+		glPopMatrix();
+	}
 		//Prototypes:
 		extern void showAnthonyName(int x, int y);
 		extern void showMohammedName(int x, int y);
