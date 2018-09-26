@@ -3,11 +3,17 @@
 
 using namespace std;
 
-void printAnthony(int x, int y)
+void showAnthonyName(int x, int y)
 {
-	Rect c;
-	//glClearColor(0.1,0.1,0.1,1.0);
+	//Credits
+	Rect credit;
+	credit.bot = y + 50;
+	credit.left = x;
+	credit.center = 0;
+	ggprint8b(&credit, 16, 0x00ff0000, "CREDITS: ");
 
+	//My Name
+	Rect c;
 	c.bot = y;
 	c.left = x;
 	c.center = 0;

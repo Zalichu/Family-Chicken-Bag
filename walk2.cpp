@@ -1,4 +1,5 @@
-//3350
+//Modified by: Anthony Rodriguez
+//3350 
 //program: walk2.cpp
 //author:  Gordon Griesel
 //date:    summer 2017
@@ -104,6 +105,7 @@ public:
 	int walk;
 	int walkFrame;
 	double delay;
+	bool credits;
 	Image *walkImage;
 	GLuint walkTexture;
 	Vec box[20];
@@ -117,6 +119,7 @@ public:
 		logClose();
 	}
 	Global() {
+		credits = false;
 		logOpen();
 		camera[0] = camera[1] = 0.0;
 		movie=0;
@@ -139,7 +142,7 @@ public:
 		exp44.delay = 0.022;
 		for (int i=0; i<20; i++) {
 			box[i][0] = rnd() * xres;
-			box[i][1] = rnd() * (yres-220) + 220.0;
+			box[i][1] = rnd() * (yres-220) + 270; //Image Movement
 			box[i][2] = 0.0;
 		}
 		memset(keys, 0, 65536);
@@ -211,7 +214,7 @@ public:
 	void setTitle() {
 		//Set the window title bar.
 		XMapWindow(dpy, win);
-		XStoreName(dpy, win, "3350 - Walk Cycle");
+		XStoreName(dpy, win, "Family Chicken Bag");
 	}
 	void setupScreenRes(const int w, const int h) {
 		gl.xres = w;
@@ -578,6 +581,20 @@ int checkKeys(XEvent *e)
 			timers.recordTime(&gl.exp44.time);
 			gl.exp44.onoff ^= 1;
 			break;
+		//Credits
+		case XK_c:
+			/*if (gl.credits == false)
+			{
+				gl.credits = true;
+				break;
+			}
+			if (gl.credits == true)
+			{
+				gl.credits = false;
+				break;
+			}*/
+				gl.credits ^= 1; 
+			break;
 		case XK_Left:
 			break;
 		case XK_Right:
@@ -718,6 +735,24 @@ void render(void)
 	Rect r;
 	//Clear the screen
 	glClearColor(0.1, 0.1, 0.1, 1.0);
+	if (gl.credits) {
+		glClearColor(0.1, 0.1, 0.1, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT);
+		//Prototypes:
+		extern void showAnthonyName(int x, int y);
+		extern void showMohammedName(int x, int y);
+		extern void showCleoName(int x, int y);
+		extern void	showMasonName(int x, int y);
+		extern void showEmmanuelName(int x, int y);
+		//Function Calls:
+		showAnthonyName(100, gl.yres-100);
+		showMohammedName(100, gl.yres-150);
+		showCleoName(100, gl.yres-200);
+		showMasonName(100, gl.yres-250);
+		showEmmanuelName(100, gl.yres-300);
+		return;
+	}
+
 	glClear(GL_COLOR_BUFFER_BIT);
 	float cx = gl.xres/2.0;
 	float cy = gl.yres/2.0;
@@ -922,10 +957,3 @@ void render(void)
 		screenCapture();
 	}
 }
-
-
-
-
-
-
-
