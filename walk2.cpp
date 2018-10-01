@@ -105,7 +105,8 @@ public:
 	int walk;
 	int walkFrame;
 	double delay;
-	bool credits;
+	bool credits; //Added
+	bool menu; // Added
 	Image *walkImage;
 	GLuint walkTexture;
 	Vec box[20];
@@ -119,6 +120,7 @@ public:
 		logClose();
 	}
 	Global() {
+		menu = false;
 		credits = false;
 		logOpen();
 		camera[0] = camera[1] = 0.0;
@@ -585,7 +587,10 @@ int checkKeys(XEvent *e)
 		case XK_c:
 				gl.credits ^= 1; 
 			break;
-		//
+		//Menu
+		case XK_p:
+				gl.menu ^= 1;
+			break;
 		case XK_Left:
 			break;
 		case XK_Right:
@@ -726,22 +731,32 @@ void render(void)
 	Rect r;
 	//Clear the screen
 	glClearColor(0.1, 0.1, 0.1, 1.0);
+
+	if (gl.menu) {
+		glClearColor(0.1, 0.1, 0.1, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		extern void titleScreen(int x, int y);
+		titleScreen(100, gl.yres-100);
+		return;
+	}
+
 	if (gl.credits) {
 		glClearColor(0.1, 0.1, 0.1, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
-	//show boxes as background
-	for (int i=0; i<20; i++) {
-		glPushMatrix();
-		glTranslated(gl.box[i][0],gl.box[i][1],gl.box[i][2]);
-		glColor3f(0.2, 0.2, 0.2);
-		glBegin(GL_QUADS);
+		//show boxes as background
+		for (int i=0; i<20; i++) {
+			glPushMatrix();
+			glTranslated(gl.box[i][0],gl.box[i][1],gl.box[i][2]);
+			glColor3f(0.2, 0.2, 0.2);
+			glBegin(GL_QUADS);
 			glVertex2i( 0,  0);
 			glVertex2i( 0, 30);
 			glVertex2i(20, 30);
 			glVertex2i(20,  0);
-		glEnd();
-		glPopMatrix();
-	}
+			glEnd();
+			glPopMatrix();
+		}
 		//Prototypes:
 		extern void showAnthonyName(int x, int y);
 		extern void showMohammedName(int x, int y);
