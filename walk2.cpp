@@ -122,6 +122,11 @@ public:
 	//camera is centered at (0,0) lower-left of screen. 
 	Flt camera[2];
 	GLuint tigerTexture;
+	GLuint dogTexture;
+	GLuint subaruTexture;
+	GLuint kfcTexture;
+
+
 	~Global() {
 		logClose();
 	}
@@ -343,11 +348,14 @@ public:
 			unlink(ppmname);
 	}
 };
-Image img[4] = {
+Image img[7] = {
 "./images/walk.gif",
 "./images/exp.png",
 "./images/exp44.png",
-"./images/tiger.jpg" };
+"./images/tiger.jpg",
+"./images/subaru.jpg",
+"./images/dog.jpg",
+"./images/KFC.png" };
 
 
 int main(void)
@@ -403,15 +411,51 @@ unsigned char *buildAlphaData(Image *img)
 void initOpengl(void)
 {
 
-	//OpenGL initialization
-	glGenTextures(1, &gl.tigerTexture);
-	int tigerW = img[3].width; 
- 	int tigerH = img[3].height; 
-	glBindTexture(GL_TEXTURE_2D, gl.tigerTexture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D,0,3,tigerW,tigerH,0, GL_RGB, GL_UNSIGNED_BYTE, img[3].data);
-	glViewport(0, 0, gl.xres, gl.yres);
+
+		//OpenGL initialization
+		//TIGER 
+		glGenTextures(1, &gl.tigerTexture);
+		int tigerW = img[3].width; 
+		int tigerH = img[3].height; 
+		glBindTexture(GL_TEXTURE_2D, gl.tigerTexture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D,0,3,tigerW,tigerH,0, GL_RGB, GL_UNSIGNED_BYTE, img[3].data);
+		glViewport(0, 0, gl.xres, gl.yres);
+
+		//SUBARU
+		glGenTextures(1, &gl.subaruTexture);
+		int subaruW = img[4].width; 
+		int subaruH = img[4].height; 
+		glBindTexture(GL_TEXTURE_2D, gl.subaruTexture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D, 0, 3, subaruW, subaruH, 0, GL_RGB,
+					 GL_UNSIGNED_BYTE, img[4].data);
+		glViewport(0, 0, gl.xres, gl.yres);	
+
+		//DOG
+		glGenTextures(1, &gl.dogTexture);
+		int dogW = img[5].width; 
+		int dogH = img[5].height; 
+		glBindTexture(GL_TEXTURE_2D, gl.dogTexture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D, 0, 3, dogW, dogH, 0, GL_RGB,
+					 GL_UNSIGNED_BYTE, img[5].data);
+		glViewport(0, 0, gl.xres, gl.yres);	
+
+		//KFC
+		glGenTextures(1, &gl.kfcTexture);
+		int kfcW = img[6].width; 
+		int kfcH = img[6].height; 
+		glBindTexture(GL_TEXTURE_2D, gl.kfcTexture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D, 0, 3, kfcW, kfcH, 0, GL_RGB,
+					 GL_UNSIGNED_BYTE, img[6].data);
+		glViewport(0, 0, gl.xres, gl.yres);	
+
 	//Initialize matrices
 	glMatrixMode(GL_PROJECTION); glLoadIdentity();
 	glMatrixMode(GL_MODELVIEW); glLoadIdentity();
@@ -780,13 +824,20 @@ void render(void)
 		extern void showMasonName(int x, int y);
 		extern void showEmmanuelName(int x, int y);
 		extern void showMohammedPicture(int , int, GLuint);
+		extern void showMasonPicture(int, int, GLuint);
+		extern void showCleoPicture(int, int, GLuint);
+		extern void showEmmanuelPic(int, int, GLuint);
 		//Function Calls:
 		showAnthonyName(100, gl.yres-100);
-		showMohammedName(100, gl.yres-150);
-		showCleoName(100, gl.yres-200);
-		showMasonName(100, gl.yres-250);
-		showEmmanuelName(100, gl.yres-300);
-		showMohammedPicture(300, 450, gl.tigerTexture);
+		showMohammedName(100, gl.yres-200);
+		showCleoName(100, gl.yres-300);
+		showMasonName(100, gl.yres-400);
+		showEmmanuelName(100, gl.yres-500);
+
+		showMohammedPicture(300, 400, gl.tigerTexture);
+	    showCleoPicture(300, 300, gl.kfcTexture);
+		showMasonPicture(300, 200, gl.subaruTexture);
+		showEmmanuelPic(300, 100, gl.dogTexture);
 		return;
 	}
 
