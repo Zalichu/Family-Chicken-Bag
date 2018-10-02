@@ -78,7 +78,11 @@ public:
 } timers;
 //-----------------------------------------------------------------------------
 
+
+// Past image class here. if it did not work.
+
 class Image;
+
 
 class Sprite {
 public:
@@ -96,6 +100,7 @@ public:
 		delay = 0.1;
 	}
 };
+
 
 class Global {
 public:
@@ -116,6 +121,7 @@ public:
 	Vec ball_vel;
 	//camera is centered at (0,0) lower-left of screen. 
 	Flt camera[2];
+	GLuint tigerTexture;
 	~Global() {
 		logClose();
 	}
@@ -148,6 +154,7 @@ public:
 			box[i][2] = 0.0;
 		}
 		memset(keys, 0, 65536);
+		// my texture
 	}
 } gl;
 
@@ -336,10 +343,11 @@ public:
 			unlink(ppmname);
 	}
 };
-Image img[3] = {
+Image img[4] = {
 "./images/walk.gif",
 "./images/exp.png",
-"./images/exp44.png" };
+"./images/exp44.png",
+"./images/tiger.jpg" };
 
 
 int main(void)
@@ -394,7 +402,15 @@ unsigned char *buildAlphaData(Image *img)
 
 void initOpengl(void)
 {
+
 	//OpenGL initialization
+	glGenTextures(1, &gl.tigerTexture);
+	int tigerW = img[3].width; 
+ 	int tigerH = img[3].height; 
+	glBindTexture(GL_TEXTURE_2D, gl.tigerTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D,0,3,tigerW,tigerH,0, GL_RGB, GL_UNSIGNED_BYTE, img[3].data);
 	glViewport(0, 0, gl.xres, gl.yres);
 	//Initialize matrices
 	glMatrixMode(GL_PROJECTION); glLoadIdentity();
@@ -761,14 +777,16 @@ void render(void)
 		extern void showAnthonyName(int x, int y);
 		extern void showMohammedName(int x, int y);
 		extern void showCleoName(int x, int y);
-		extern void	showMasonName(int x, int y);
+		extern void showMasonName(int x, int y);
 		extern void showEmmanuelName(int x, int y);
+		extern void showMohammedPicture(int , int, GLuint);
 		//Function Calls:
 		showAnthonyName(100, gl.yres-100);
 		showMohammedName(100, gl.yres-150);
 		showCleoName(100, gl.yres-200);
 		showMasonName(100, gl.yres-250);
 		showEmmanuelName(100, gl.yres-300);
+		showMohammedPicture(300, 450, gl.tigerTexture);
 		return;
 	}
 
