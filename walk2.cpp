@@ -125,7 +125,7 @@ public:
 	GLuint dogTexture;
 	GLuint subaruTexture;
 	GLuint kfcTexture;
-
+	GLuint anthonyTexture;
 
 	~Global() {
 		logClose();
@@ -348,14 +348,15 @@ public:
 			unlink(ppmname);
 	}
 };
-Image img[7] = {
+Image img[8] = {
 "./images/walk.gif",
 "./images/exp.png",
 "./images/exp44.png",
 "./images/tiger.jpg",
 "./images/subaru.jpg",
 "./images/dog.jpg",
-"./images/KFC.png" };
+"./images/KFC.png", 
+"./images/anthony.jpg"};
 
 
 int main(void)
@@ -455,6 +456,16 @@ void initOpengl(void)
 		glTexImage2D(GL_TEXTURE_2D, 0, 3, kfcW, kfcH, 0, GL_RGB,
 					 GL_UNSIGNED_BYTE, img[6].data);
 		glViewport(0, 0, gl.xres, gl.yres);	
+
+		//Anthony 
+		glGenTextures(1, &gl.anthonyTexture);
+		int anthonyW = img[7].width; 
+		int anthonyH = img[7].height; 
+		glBindTexture(GL_TEXTURE_2D, gl.anthonyTexture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D,0,3,anthonyW,anthonyH,0, GL_RGB, GL_UNSIGNED_BYTE, img[7].data);
+		glViewport(0, 0, gl.xres, gl.yres);
 
 	//Initialize matrices
 	glMatrixMode(GL_PROJECTION); glLoadIdentity();
@@ -823,10 +834,13 @@ void render(void)
 		extern void showCleoName(int x, int y);
 		extern void showMasonName(int x, int y);
 		extern void showEmmanuelName(int x, int y);
-		extern void showMohammedPicture(int , int, GLuint);
+
+		extern void showMohammedPicture(int x , int y, GLuint);
 		extern void showMasonPicture(int, int, GLuint);
 		extern void showCleoPicture(int, int, GLuint);
 		extern void showEmmanuelPic(int, int, GLuint);
+		extern void showAnthonyPicture(int, int, GLuint);
+
 		//Function Calls:
 		showAnthonyName(100, gl.yres-100);
 		showMohammedName(100, gl.yres-200);
@@ -838,6 +852,7 @@ void render(void)
 	    showCleoPicture(300, 300, gl.kfcTexture);
 		showMasonPicture(300, 200, gl.subaruTexture);
 		showEmmanuelPic(300, 100, gl.dogTexture);
+		showAnthonyPicture(300, 500, gl.anthonyTexture);
 		return;
 	}
 

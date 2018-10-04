@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include "fonts.h"
+#include <GL/glx.h>
 
 using namespace std;
 
@@ -30,6 +31,21 @@ void showAnthonyName(int x, int y)
 	ggprint8b(&c, 16, color("white"), "Anthony Rodriguez");
 }
 
+void showAnthonyPicture(int x, int y, GLuint texid) 
+{ 
+    glColor3ub(255, 255, 255);
+    int wid = 40;
+    glPushMatrix();
+    glTranslatef(x, y, 0);
+    glBindTexture(GL_TEXTURE_2D, texid);
+    glBegin(GL_QUADS);
+    	glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -wid);
+    	glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, wid);
+    	glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, wid);
+    	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -wid);
+    glEnd();
+    glPopMatrix();	
+} 
 
 void titleScreen(int x, int y)
 {
