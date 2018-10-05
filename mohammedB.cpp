@@ -2,10 +2,8 @@
 //Date: 25/09/2018
 
 #include<iostream>
-#include<math.h> 
 #include<GL/glx.h>
 #include "fonts.h"
-
 using namespace std; 
 
 void showMohammedName(int x, int y) { 
@@ -16,8 +14,7 @@ void showMohammedName(int x, int y) {
     ggprint8b(&r, 16, 0x00ff0000, "Mohammed Bakraa"); 
 }
 
-void showMohammedPicture(int x, int y, GLuint texid) 
-{ 
+void showMohammedPicture(int x, int y, GLuint texid) { 
     /*static float angle = 0.0f; 
     float fx = (float)x;
     float fy = (float)y;
