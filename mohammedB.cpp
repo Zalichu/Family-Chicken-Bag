@@ -15,12 +15,6 @@ void showMohammedName(int x, int y) {
 }
 
 void showMohammedPicture(int x, int y, GLuint texid) { 
-    /*static float angle = 0.0f; 
-    float fx = (float)x;
-    float fy = (float)y;
-    float a = sin(angle) * 10.0f;
-    fx += a; 
-    angle += 0.2f;*/
     glColor3ub(255, 255, 255);
     int wid = 40;
     glPushMatrix();
@@ -34,3 +28,21 @@ void showMohammedPicture(int x, int y, GLuint texid) {
     glEnd();
     glPopMatrix();	
 } 
+
+// set fixed game background
+void showBackground(int x, int y, GLuint texid) { 
+    glColor3ub(255, 255, 255);
+    int wid = 480;
+    glPushMatrix();
+    glTranslatef(x, y, 0);
+    glBindTexture(GL_TEXTURE_2D, texid);
+    glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -wid);
+    	glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, wid);
+    	glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, wid);
+    	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -wid);
+    glEnd();
+    glPopMatrix();	
+} 
+
+

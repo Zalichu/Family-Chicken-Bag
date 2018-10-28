@@ -112,6 +112,7 @@ public:
 	double delay;
 	bool credits; //Added
 	bool menu; // Added
+	bool background; // fixed background
 	Image *walkImage;
 	GLuint walkTexture;
 	Vec box[20];
@@ -126,6 +127,7 @@ public:
 	GLuint subaruTexture;
 	GLuint kfcTexture;
 	GLuint anthonyTexture;
+	GLuint backgroundTexture;
 
 	~Global() {
 		logClose();
@@ -133,6 +135,7 @@ public:
 	Global() {
 		menu = false;
 		credits = false;
+		background = false;
 		logOpen();
 		camera[0] = camera[1] = 0.0;
 		movie=0;
@@ -317,6 +320,7 @@ public:
 			//printf("name **%s**\n", name);
 			sprintf(ppmname,"%s.ppm", name);
 			//printf("ppmname **%s**\n", ppmname);
+			
 			char ts[100];
 			//system("convert eball.jpg eball.ppm");
 			sprintf(ts, "convert %s %s", fname, ppmname);
@@ -358,9 +362,13 @@ Image img[8] = {
 "./images/KFC.png", 
 "./images/anthony.jpg"};
 
-
+Image backgroundImg[2] = { 
+"./images/background/clam-parking.jpg", 
+"./images/background/clam-noparking.gif" 
+};
 int main(void)
 {
+	srand (time(NULL));
 	initOpengl();
 	init();
 	int done = 0;
@@ -423,6 +431,19 @@ void initOpengl(void)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 		glTexImage2D(GL_TEXTURE_2D,0,3,tigerW,tigerH,0, GL_RGB, GL_UNSIGNED_BYTE, img[3].data);
 		glViewport(0, 0, gl.xres, gl.yres);
+
+		//Background  
+		glGenTextures(1, &gl.backgroundTexture);
+		int randBack = rand() % 2; 
+		int backgroundW = backgroundImg[randBack].width; 
+		int backgroundH = backgroundImg[randBack].height; 
+		glBindTexture(GL_TEXTURE_2D, gl.backgroundTexture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D,0,3,backgroundW,backgroundH,0, GL_RGB, GL_UNSIGNED_BYTE, backgroundImg[randBack].data);
+		glViewport(0, 0, gl.xres, gl.yres);
+
+
 
 		//SUBARU
 		glGenTextures(1, &gl.subaruTexture);
@@ -656,11 +677,14 @@ int checkKeys(XEvent *e)
 			break;
 		//Credits
 		case XK_c:
-				gl.credits ^= 1; 
+			gl.credits ^= 1; 
 			break;
 		//Menu
 		case XK_p:
-				gl.menu ^= 1;
+			gl.menu ^= 1;
+			break;
+		case XK_b:
+			gl.background ^= 1;
 			break;
 		case XK_Left:
 			break;
@@ -828,6 +852,10 @@ void render(void)
 			glEnd();
 			glPopMatrix();
 		}
+
+
+	
+
 		//Prototypes:
 		extern void showAnthonyName(int x, int y);
 		extern void showMohammedName(int x, int y);
@@ -856,6 +884,14 @@ void render(void)
 		return;
 	}
 
+	if (gl.background) {
+		glClearColor(0.1, 0.1, 0.1, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT);
+		extern void showBackground(int x , int y, GLuint);
+		showBackground(400, 400, gl.backgroundTexture);
+		return;
+		}
+
 	glClear(GL_COLOR_BUFFER_BIT);
 	float cx = gl.xres/2.0;
 	float cy = gl.yres/2.0;
@@ -882,8 +918,9 @@ void render(void)
 			glVertex2i(20,  0);
 		glEnd();
 		glPopMatrix();
-	}
-	//
+	} 
+
+		//
 	//========================
 	//Render the tile system
 	//========================
@@ -936,7 +973,7 @@ void render(void)
 			--row;
 		}
 		col = (col+1) % lev.ncols;
-	}
+	} 
 	glColor3f(1.0, 1.0, 0.1);
 	glPushMatrix();
 	//put ball in its place
