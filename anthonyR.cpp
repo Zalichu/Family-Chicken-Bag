@@ -31,8 +31,8 @@ void showAnthonyName(int x, int y)
 	ggprint8b(&c, 16, color("white"), "Anthony Rodriguez");
 }
 
-void showAnthonyPicture(int x, int y, GLuint texid) 
-{ 
+void showAnthonyPicture(int x, int y, GLuint texid)
+{
     glColor3ub(255, 255, 255);
     int wid = 40;
     glPushMatrix();
@@ -44,8 +44,8 @@ void showAnthonyPicture(int x, int y, GLuint texid)
     	glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, wid);
     	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -wid);
     glEnd();
-    glPopMatrix();	
-} 
+    glPopMatrix();
+}
 
 void titleScreen(int x, int y)
 {
@@ -54,7 +54,7 @@ void titleScreen(int x, int y)
 	menu.bot = y;
 	menu.left = x;
 	menu.center = 0;
-	ggprint8b(&menu, 20, color("white"), "PLAY");
+	ggprint8b(&menu, 20, color("red"), "PLAY");
 
 	//Credits Button
 	menu.bot = y - 50;
@@ -92,7 +92,3 @@ int color(string colorChoice)
 	}
 	return 0x0ff0000; //Default's to red
 }
-
-
-
-
