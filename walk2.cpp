@@ -139,7 +139,7 @@ public:
 		logClose();
 	}
 	Global() {
-		playerHealth = 100;
+		playerHealth = 80;
 		menu = false;
 		credits = false;
 		background = false;
@@ -881,7 +881,6 @@ void physics(void)
 
 void render(void)
 {
-	Rect r;
 	//Clear the screen
 	glClearColor(0.1, 0.1, 0.1, 1.0);
 
@@ -1080,8 +1079,8 @@ void render(void)
 	glPopMatrix();
 
 	//Show Health
-	extern void showHealth(int, int, GLuint);
-	showHealth(100, 500, gl.healthTexture);
+	extern void showHealth(int, int, int, GLuint);
+	showHealth(100, 500, gl.playerHealth, gl.healthTexture);
 
 	//Show Healthbar UI	
 	extern void showHealthbar(int, int, GLuint);

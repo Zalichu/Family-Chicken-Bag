@@ -60,30 +60,32 @@ void showHealthbar(int x, int y, GLuint texid)
 {
     glColor3ub(255, 255, 255);
     int wid = 80;
+	int height = 80;
     glPushMatrix();
     glTranslatef(x, y, 0);
     glBindTexture(GL_TEXTURE_2D, texid);
     glBegin(GL_QUADS);
-    	glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -wid);
-    	glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, wid);
-    	glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, wid);
-    	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -wid);
+    	glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -height);
+    	glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, height);
+    	glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, height);
+    	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -height);
     glEnd();
     glPopMatrix();
 }
 
-void showHealth(int x, int y, GLuint texid)
+void showHealth(int x, int y, int playerHealth, GLuint texid)
 {
     glColor3ub(255, 255, 255);
-    int wid = 80;
+    int wid = playerHealth;
+	int height = 80;
     glPushMatrix();
     glTranslatef(x, y, 0);
     glBindTexture(GL_TEXTURE_2D, texid);
     glBegin(GL_QUADS);
-    	glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -wid);
-    	glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, wid);
-    	glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, wid);
-    	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -wid);
+    	glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -height);
+    	glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, height);
+    	glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, height);
+    	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -height);
     glEnd();
     glPopMatrix();
 }
