@@ -104,6 +104,9 @@ public:
 
 class Global {
 public:
+	//PLAYER 
+	int playerHealth;
+	//
 	unsigned char keys[65536];
 	int xres, yres;
 	int movie, movieStep;
@@ -128,11 +131,14 @@ public:
 	GLuint kfcTexture;
 	GLuint anthonyTexture;
 	GLuint backgroundTexture;
+	GLuint healthbarTexture;	
+	GLuint healthTexture;
 
 	~Global() {
 		logClose();
 	}
 	Global() {
+		playerHealth = 100;
 		menu = false;
 		credits = false;
 		background = false;
@@ -352,7 +358,7 @@ public:
 			unlink(ppmname);
 	}
 };
-Image img[8] = {
+Image img[10] = {
 "./images/walk.gif",
 "./images/exp.png",
 "./images/exp44.png",
@@ -360,12 +366,15 @@ Image img[8] = {
 "./images/subaru.jpg",
 "./images/dog.jpg",
 "./images/KFC.png", 
-"./images/anthony.jpg"};
+"./images/anthony.jpg",
+"./images/objects/HealthBarUI.png",
+"./images/objects/health.jpg"};
 
 Image backgroundImg[2] = { 
 "./images/background/clam-parking.jpg", 
 "./images/background/clam-noparking.gif" 
 };
+
 int main(void)
 {
 	srand (time(NULL));
@@ -419,74 +428,82 @@ unsigned char *buildAlphaData(Image *img)
 
 void initOpengl(void)
 {
+	//OpenGL initialization
+	//TIGER 
+	glGenTextures(1, &gl.tigerTexture);
+	int tigerW = img[3].width; 
+	int tigerH = img[3].height; 
+	glBindTexture(GL_TEXTURE_2D, gl.tigerTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D,0,3,tigerW,tigerH,0, GL_RGB, GL_UNSIGNED_BYTE, img[3].data);
+	glViewport(0, 0, gl.xres, gl.yres);
 
+	//Background  
+	glGenTextures(1, &gl.backgroundTexture);
+	//int randBack = rand() % 2; 
+	int randBack = 1;
+	int backgroundW = backgroundImg[randBack].width; 
+	int backgroundH = backgroundImg[randBack].height; 
+	glBindTexture(GL_TEXTURE_2D, gl.backgroundTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D,0,3,backgroundW,backgroundH,0, GL_RGB, GL_UNSIGNED_BYTE, backgroundImg[randBack].data);
+	glViewport(0, 0, gl.xres, gl.yres);
 
-		//OpenGL initialization
-		//TIGER 
-		glGenTextures(1, &gl.tigerTexture);
-		int tigerW = img[3].width; 
-		int tigerH = img[3].height; 
-		glBindTexture(GL_TEXTURE_2D, gl.tigerTexture);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_2D,0,3,tigerW,tigerH,0, GL_RGB, GL_UNSIGNED_BYTE, img[3].data);
-		glViewport(0, 0, gl.xres, gl.yres);
+	//SUBARU
+	glGenTextures(1, &gl.subaruTexture);
+	int subaruW = img[4].width; 
+	int subaruH = img[4].height; 
+	glBindTexture(GL_TEXTURE_2D, gl.subaruTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, subaruW, subaruH, 0, GL_RGB,
+				 GL_UNSIGNED_BYTE, img[4].data);
+	glViewport(0, 0, gl.xres, gl.yres);	
 
-		//Background  
-		glGenTextures(1, &gl.backgroundTexture);
-		int randBack = rand() % 2; 
-		int backgroundW = backgroundImg[randBack].width; 
-		int backgroundH = backgroundImg[randBack].height; 
-		glBindTexture(GL_TEXTURE_2D, gl.backgroundTexture);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_2D,0,3,backgroundW,backgroundH,0, GL_RGB, GL_UNSIGNED_BYTE, backgroundImg[randBack].data);
-		glViewport(0, 0, gl.xres, gl.yres);
+	//DOG
+	glGenTextures(1, &gl.dogTexture);
+	int dogW = img[5].width; 
+	int dogH = img[5].height; 
+	glBindTexture(GL_TEXTURE_2D, gl.dogTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, dogW, dogH, 0, GL_RGB,
+				 GL_UNSIGNED_BYTE, img[5].data);
+	glViewport(0, 0, gl.xres, gl.yres);	
 
+	//KFC
+	glGenTextures(1, &gl.kfcTexture);
+	int kfcW = img[6].width; 
+	int kfcH = img[6].height; 
+	glBindTexture(GL_TEXTURE_2D, gl.kfcTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, kfcW, kfcH, 0, GL_RGB,
+				 GL_UNSIGNED_BYTE, img[6].data);
+	glViewport(0, 0, gl.xres, gl.yres);	
 
-
-		//SUBARU
-		glGenTextures(1, &gl.subaruTexture);
-		int subaruW = img[4].width; 
-		int subaruH = img[4].height; 
-		glBindTexture(GL_TEXTURE_2D, gl.subaruTexture);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_2D, 0, 3, subaruW, subaruH, 0, GL_RGB,
-					 GL_UNSIGNED_BYTE, img[4].data);
-		glViewport(0, 0, gl.xres, gl.yres);	
-
-		//DOG
-		glGenTextures(1, &gl.dogTexture);
-		int dogW = img[5].width; 
-		int dogH = img[5].height; 
-		glBindTexture(GL_TEXTURE_2D, gl.dogTexture);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_2D, 0, 3, dogW, dogH, 0, GL_RGB,
-					 GL_UNSIGNED_BYTE, img[5].data);
-		glViewport(0, 0, gl.xres, gl.yres);	
-
-		//KFC
-		glGenTextures(1, &gl.kfcTexture);
-		int kfcW = img[6].width; 
-		int kfcH = img[6].height; 
-		glBindTexture(GL_TEXTURE_2D, gl.kfcTexture);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_2D, 0, 3, kfcW, kfcH, 0, GL_RGB,
-					 GL_UNSIGNED_BYTE, img[6].data);
-		glViewport(0, 0, gl.xres, gl.yres);	
-
-		//Anthony 
-		glGenTextures(1, &gl.anthonyTexture);
-		int anthonyW = img[7].width; 
-		int anthonyH = img[7].height; 
-		glBindTexture(GL_TEXTURE_2D, gl.anthonyTexture);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_2D,0,3,anthonyW,anthonyH,0, GL_RGB, GL_UNSIGNED_BYTE, img[7].data);
-		glViewport(0, 0, gl.xres, gl.yres);
+	//Anthony 
+	glGenTextures(1, &gl.anthonyTexture);
+	int anthonyW = img[7].width; 
+	int anthonyH = img[7].height; 
+	glBindTexture(GL_TEXTURE_2D, gl.anthonyTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D,0,3,anthonyW,anthonyH,0, GL_RGB, GL_UNSIGNED_BYTE, img[7].data);
+	glViewport(0, 0, gl.xres, gl.yres);
+		
+		
+	//Health Bar UI 
+	glGenTextures(1, &gl.healthbarTexture);
+	int healthbarW = img[8].width; 
+	int healthbarH = img[8].height; 
+	glBindTexture(GL_TEXTURE_2D, gl.healthbarTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D,0,3,healthbarW,healthbarH,0, GL_RGB, GL_UNSIGNED_BYTE, img[8].data);
+	glViewport(0, 0, gl.xres, gl.yres);
 
 	//Initialize matrices
 	glMatrixMode(GL_PROJECTION); glLoadIdentity();
@@ -527,6 +544,22 @@ void initOpengl(void)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, walkData);
 	free(walkData);
+
+	//HEALTH BAR
+	//-------------------------------------------------------------------------
+	//create opengl texture elements
+	w = img[8].width;
+	h = img[8].height;
+	glGenTextures(1, &gl.exp.tex);
+
+	glBindTexture(GL_TEXTURE_2D, gl.healthbarTexture);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	unsigned char *healthData = buildAlphaData(&img[8]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, healthData);
+	free(healthData);
+	//
 	//-------------------------------------------------------------------------
 	//create opengl texture elements
 	w = img[1].width;
@@ -852,10 +885,6 @@ void render(void)
 			glEnd();
 			glPopMatrix();
 		}
-
-
-	
-
 		//Prototypes:
 		extern void showAnthonyName(int x, int y);
 		extern void showMohammedName(int x, int y);
@@ -890,7 +919,7 @@ void render(void)
 		extern void showBackground(int x , int y, GLuint);
 		showBackground(400, 400, gl.backgroundTexture);
 		return;
-		}
+	}
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	float cx = gl.xres/2.0;
@@ -905,7 +934,7 @@ void render(void)
 		glVertex2i(gl.xres,   0);
 		glVertex2i(0,         0);
 	glEnd();
-	//
+
 	//show boxes as background
 	for (int i=0; i<20; i++) {
 		glPushMatrix();
@@ -920,7 +949,6 @@ void render(void)
 		glPopMatrix();
 	} 
 
-		//
 	//========================
 	//Render the tile system
 	//========================
@@ -986,8 +1014,6 @@ void render(void)
 	glEnd();
 	glPopMatrix();
 	//--------------------------------------
-	//
-	//#define SHOW_FAKE_SHADOW
 	#ifdef SHOW_FAKE_SHADOW
 	glColor3f(0.25, 0.25, 0.25);
 	glBegin(GL_QUADS);
@@ -997,8 +1023,7 @@ void render(void)
 		glVertex2i(cx-60, 130);
 	glEnd();
 	#endif
-	//
-	//
+	//--------------------------------------
 	float h = 200.0;
 	float w = h * 0.5;
 	glPushMatrix();
@@ -1028,61 +1053,15 @@ void render(void)
 		}
 	glEnd();
 	glPopMatrix();
+
+	//Show Healthbar	
+	extern void showHealthbar(int, int, GLuint);
+	showHealthbar(100 ,500 ,gl.healthbarTexture);
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_ALPHA_TEST);
-	//
-	//
-	if (gl.exp.onoff) {
-		h = 80.0;
-		w = 80.0;
-		glPushMatrix();
-		glColor3f(1.0, 1.0, 1.0);
-		glBindTexture(GL_TEXTURE_2D, gl.exp.tex);
-		glEnable(GL_ALPHA_TEST);
-		glAlphaFunc(GL_GREATER, 0.0f);
-		glColor4ub(255,255,255,255);
-		glTranslated(gl.exp.pos[0], gl.exp.pos[1], gl.exp.pos[2]);
-		int ix = gl.exp.frame % 5;
-		int iy = gl.exp.frame / 5;
-		float tx = (float)ix / 5.0;
-		float ty = (float)iy / 5.0;
-		glBegin(GL_QUADS);
-			glTexCoord2f(tx,     ty+0.2); glVertex2i(cx-w, cy-h);
-			glTexCoord2f(tx,     ty);     glVertex2i(cx-w, cy+h);
-			glTexCoord2f(tx+0.2, ty);     glVertex2i(cx+w, cy+h);
-			glTexCoord2f(tx+0.2, ty+0.2); glVertex2i(cx+w, cy-h);
-		glEnd();
-		glPopMatrix();
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glDisable(GL_ALPHA_TEST);
-	}
-	//
-	//
-	if (gl.exp44.onoff) {
-		h = 80.0;
-		w = 80.0;
-		glPushMatrix();
-		glColor3f(1.0, 1.0, 1.0);
-		glBindTexture(GL_TEXTURE_2D, gl.exp44.tex);
-		glEnable(GL_ALPHA_TEST);
-		glAlphaFunc(GL_GREATER, 0.0f);
-		glColor4ub(255,255,255,255);
-		glTranslated(gl.exp44.pos[0], gl.exp44.pos[1], gl.exp44.pos[2]);
-		int ix = gl.exp44.frame % 4;
-		int iy = gl.exp44.frame / 4;
-		float tx = (float)ix / 4.0;
-		float ty = (float)iy / 4.0;
-		glBegin(GL_QUADS);
-			glTexCoord2f(tx,      ty+0.25); glVertex2i(cx-w, cy-h);
-			glTexCoord2f(tx,      ty);      glVertex2i(cx-w, cy+h);
-			glTexCoord2f(tx+0.25, ty);      glVertex2i(cx+w, cy+h);
-			glTexCoord2f(tx+0.25, ty+0.25); glVertex2i(cx+w, cy-h);
-		glEnd();
-		glPopMatrix();
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glDisable(GL_ALPHA_TEST);
-	}
-	unsigned int c = 0x00ffff44;
+	
+/*	unsigned int c = 0x00ffff44;
 	r.bot = gl.yres - 20;
 	r.left = 10;
 	r.center = 0;
@@ -1092,8 +1071,8 @@ void render(void)
 	ggprint8b(&r, 16, c, "-   slower");
 	ggprint8b(&r, 16, c, "right arrow -> walk right");
 	ggprint8b(&r, 16, c, "left arrow  <- walk left");
-	ggprint8b(&r, 16, c, "frame: %i", gl.walkFrame);
+	ggprint8b(&r, 16, c, "frame: %i", gl.walkFrame); */
 	if (gl.movie) {
 		screenCapture();
-	}
+	} 
 }
