@@ -23,8 +23,9 @@
 #include <X11/keysym.h>
 #include <GL/glx.h>
 #include "log.h"
-//#include "ppm.h"
 #include "fonts.h"
+#include <string>
+#include <iostream>
 
 //defined types
 typedef double Flt;
@@ -368,7 +369,7 @@ Image img[10] = {
 "./images/KFC.png", 
 "./images/anthony.jpg",
 "./images/objects/HealthBarUI.png",
-"./images/objects/health.jpg"};
+"./images/objects/health.png"};
 
 Image backgroundImg[2] = { 
 "./images/background/clam-parking.jpg", 
@@ -493,8 +494,17 @@ void initOpengl(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D,0,3,anthonyW,anthonyH,0, GL_RGB, GL_UNSIGNED_BYTE, img[7].data);
 	glViewport(0, 0, gl.xres, gl.yres);
-		
-		
+				
+	//Health
+	glGenTextures(1, &gl.healthTexture);
+	int healthW = img[9].width; 
+	int healthH = img[9].height; 
+	glBindTexture(GL_TEXTURE_2D, gl.healthTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D,0,3,healthW,healthH,0, GL_RGB, GL_UNSIGNED_BYTE, img[9].data);
+	glViewport(0, 0, gl.xres, gl.yres);
+
 	//Health Bar UI 
 	glGenTextures(1, &gl.healthbarTexture);
 	int healthbarW = img[8].width; 
@@ -545,6 +555,21 @@ void initOpengl(void)
 		GL_RGBA, GL_UNSIGNED_BYTE, walkData);
 	free(walkData);
 
+	//HEALTH <3
+	//-------------------------------------------------------------------------
+	//create opengl texture elements
+	w = img[9].width;
+	h = img[9].height;
+	glGenTextures(1, &gl.exp.tex);
+
+	glBindTexture(GL_TEXTURE_2D, gl.healthTexture);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	unsigned char *healtherData = buildAlphaData(&img[9]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, healtherData);
+	free(healtherData);
+	//
 	//HEALTH BAR
 	//-------------------------------------------------------------------------
 	//create opengl texture elements
@@ -1054,12 +1079,23 @@ void render(void)
 	glEnd();
 	glPopMatrix();
 
-	//Show Healthbar	
+	//Show Health
+	extern void showHealth(int, int, GLuint);
+	showHealth(100, 500, gl.healthTexture);
+
+	//Show Healthbar UI	
 	extern void showHealthbar(int, int, GLuint);
 	showHealthbar(100 ,500 ,gl.healthbarTexture);
-
+	
+	//For Text Color
+	extern int colorFont(std::string);
+	
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_ALPHA_TEST);
+	
+	//Health Bar Text
+	extern void showText(int, int, int, const char*);	
+	showText(50, gl.yres-166, colorFont("white"), "Health");
 	
 /*	unsigned int c = 0x00ffff44;
 	r.bot = gl.yres - 20;
