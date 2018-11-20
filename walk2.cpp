@@ -831,11 +831,19 @@ void physics(void)
 		if (timeSpan > gl.delay) {
 			//advance
 			++gl.walkFrame;
+<<<<<<< HEAD
 			if (gl.walkFrame >= 14)
 				gl.walkFrame -= 14;
 			timers.recordTime(&timers.walkTime);
 		}
 		for (int i=0; i<20; i++) {
+=======
+			if (gl.walkFrame >= 13)
+				gl.walkFrame -= 13;
+			timers.recordTime(&timers.walkTime);
+		}
+		for (int i=7; i<20; i++) {
+>>>>>>> c2329e189e133676ff2df0cca7fd8cfcbebeccfd
 			/*if (gl.keys[XK_Left]) {
 				gl.box[i][0] += 1.0 * (0.05 / gl.delay);
 				if (gl.box[i][0] > gl.xres + 10.0)
