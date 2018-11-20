@@ -112,6 +112,7 @@ public:
 	int xres, yres;
 	int movie, movieStep;
 	int walk;
+    int punch;
 	int walkFrame;
 	double delay;
 	bool credits; //Added
@@ -150,6 +151,7 @@ public:
 		xres=800;
 		yres=600;
 		walk=0;
+        punch=0;
 		walkFrame=0;
 		walkImage=NULL;
 		MakeVector(ball_pos, 520.0, 0, 0);
@@ -737,6 +739,9 @@ int checkKeys(XEvent *e)
 		case XK_c:
 			gl.credits ^= 1; 
 			break;
+        case XK_r:
+            gl.punch ^= 1;
+            break;
 		//Menu
 		case XK_p:
 			gl.menu ^= 1;
@@ -796,8 +801,8 @@ void physics(void)
 		if (timeSpan > gl.delay) {
 			//advance
 			++gl.walkFrame;
-			if (gl.walkFrame >= 16)
-				gl.walkFrame -= 16;
+			if (gl.walkFrame >= 7)
+				gl.walkFrame -= 7;
 			timers.recordTime(&timers.walkTime);
 		}
 		for (int i=0; i<20; i++) {
@@ -817,13 +822,43 @@ void physics(void)
 					gl.camera[0] = 0.0;
 			}
 		}
+	}
+	if (gl.punch){
+		//man is walking...
+		//when time is up, advance the frame.
+		timers.recordTime(&timers.timeCurrent);
+		double timeSpan = timers.timeDiff(&timers.walkTime, &timers.timeCurrent);
+		if (timeSpan > gl.delay) {
+			//advance
+			++gl.walkFrame;
+			if (gl.walkFrame >= 14)
+				gl.walkFrame -= 14;
+			timers.recordTime(&timers.walkTime);
+		}
+		for (int i=0; i<20; i++) {
+			/*if (gl.keys[XK_Left]) {
+				gl.box[i][0] += 1.0 * (0.05 / gl.delay);
+				if (gl.box[i][0] > gl.xres + 10.0)
+					gl.box[i][0] -= gl.xres + 10.0;
+				gl.camera[0] -= 2.0/lev.tilesize[0] * (0.05 / gl.delay);
+				if (gl.camera[0] < 0.0)
+					gl.camera[0] = 0.0;
+			} else {*/
+				gl.box[i][0] -= 1.0 * (0.05 / gl.delay);
+				if (gl.box[i][0] < -10.0)
+					gl.box[i][0] += gl.xres + 10.0;
+				gl.camera[0] += 2.0/lev.tilesize[0] * (0.05 / gl.delay);
+				if (gl.camera[0] < 0.0)
+					gl.camera[0] = 0.0;
+			}
+		}
 		if (gl.exp.onoff) {
 			gl.exp.pos[0] -= 2.0 * (0.05 / gl.delay);
 		}
 		if (gl.exp44.onoff) {
 			gl.exp44.pos[0] -= 2.0 * (0.05 / gl.delay);
 		}
-	}
+	
 	if (gl.exp.onoff) {
 		//explosion is happening
 		timers.recordTime(&timers.timeCurrent);
@@ -1057,11 +1092,11 @@ void render(void)
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.0f);
 	glColor4ub(255,255,255,255);
-	int ix = gl.walkFrame % 8;
+	int ix = gl.walkFrame % 7;
 	int iy = 0;
-	if (gl.walkFrame >= 8)
+	if (gl.walkFrame >= 7)
 		iy = 1;
-	float fx = (float)ix / 8.0;
+	float fx = (float)ix / 7.0;
 	float fy = (float)iy / 2.0;
 	glBegin(GL_QUADS);
 		if (gl.keys[XK_Left]) {
