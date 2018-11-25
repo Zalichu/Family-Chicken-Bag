@@ -1,18 +1,11 @@
-//Modified by: Anthony Rodriguez
-//3350 
-//program: walk2.cpp
-//author:  Gordon Griesel
-//date:    summer 2017
-//         spring 2018
-//
-//Walk cycle using a sprite sheet.
-//images courtesy: http://games.ucla.edu/resource/walk-cycles/
-//
-//This program includes:
-//  multiple sprite-sheet animations
-//  a level tiling system
-//  parallax scrolling of backgrounds
-//
+/*	Modified by: Family-Chicken-Bag Team : Anthony | Emmanuel | Cleo | Mohammed 
+	Original Author: Gordon Griesel
+	
+	This program includes:
+ 		multiple sprite-sheet animations
+  		a level tiling system
+  		parallax scrolling of backgrounds
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,8 +19,8 @@
 #include "fonts.h"
 #include <string>
 #include <iostream>
+#include "anthonyR.h"
 
-//defined types
 typedef double Flt;
 typedef double Vec[3];
 typedef Flt	Matrix[4][4];
@@ -41,12 +34,10 @@ typedef Flt	Matrix[4][4];
 #define VecSub(a,b,c) (c)[0]=(a)[0]-(b)[0]; \
                       (c)[1]=(a)[1]-(b)[1]; \
                       (c)[2]=(a)[2]-(b)[2]
-//constants
 const float timeslice = 1.0f;
 const float gravity = -0.2f;
 #define ALPHA 1
 
-//function prototypes
 void initOpengl();
 void checkMouse(XEvent *e);
 int checkKeys(XEvent *e);
@@ -54,8 +45,8 @@ void init();
 void physics();
 void render();
 
-//-----------------------------------------------------------------------------
-//Setup timers
+/*	SETUP TIMERS
+-----------------------------------------------------------------------------*/
 class Timers {
 public:
 	double physicsRate;
@@ -117,7 +108,7 @@ public:
 	double delay;
 	bool credits; //Added
 	bool menu; // Added
-	bool background; // fixed background
+	bool background; // Added
 	Image *walkImage;
 	GLuint walkTexture;
 	Vec box[20];
@@ -135,7 +126,7 @@ public:
 	GLuint backgroundTexture;
 	GLuint healthbarTexture;	
 	GLuint healthTexture;
-
+	GLuint keysTexture;
 	~Global() {
 		logClose();
 	}
@@ -171,7 +162,6 @@ public:
 			box[i][2] = 0.0;
 		}
 		memset(keys, 0, 65536);
-		// my texture
 	}
 } gl;
 
@@ -183,7 +173,6 @@ public:
 	Flt ftsz[2];
 	Flt tile_base;
 	Level() {
-		//Log("Level constructor\n");
 		tilesize[0] = 32;
 		tilesize[1] = 32;
 		ftsz[0] = (Flt)tilesize[0];
@@ -361,7 +350,8 @@ public:
 			unlink(ppmname);
 	}
 };
-Image img[10] = {
+
+Image img[11] = {
 "./images/walk.gif",
 "./images/exp.png",
 "./images/exp44.png",
@@ -371,7 +361,8 @@ Image img[10] = {
 "./images/KFC.png", 
 "./images/anthony.jpg",
 "./images/objects/HealthBarUI.png",
-"./images/objects/health.png"};
+"./images/objects/health.png",
+"./images/objects/arrowKeys.png"};
 
 Image backgroundImg[2] = { 
 "./images/background/clam-parking.jpg", 
@@ -401,8 +392,7 @@ int main(void)
 
 unsigned char *buildAlphaData(Image *img)
 {
-	//add 4th component to RGB stream...
-	int i;
+	//TRANSPARENCY FUNCTION
 	unsigned char *newdata, *ptr;
 	unsigned char *data = (unsigned char *)img->data;
 	newdata = (unsigned char *)malloc(img->width * img->height * 4);
@@ -412,7 +402,7 @@ unsigned char *buildAlphaData(Image *img)
 	unsigned char t0 = *(data+0);
 	unsigned char t1 = *(data+1);
 	unsigned char t2 = *(data+2);
-	for (i=0; i<img->width * img->height * 3; i+=3) {
+	for (int i=0; i<img->width * img->height * 3; i+=3) {
 		a = *(data+0);
 		b = *(data+1);
 		c = *(data+2);
@@ -431,7 +421,6 @@ unsigned char *buildAlphaData(Image *img)
 
 void initOpengl(void)
 {
-	//OpenGL initialization
 	//TIGER 
 	glGenTextures(1, &gl.tigerTexture);
 	int tigerW = img[3].width; 
@@ -444,8 +433,7 @@ void initOpengl(void)
 
 	//Background  
 	glGenTextures(1, &gl.backgroundTexture);
-	//int randBack = rand() % 2; 
-	int randBack = 1;
+	int randBack = 1;	//Current Background Image
 	int backgroundW = backgroundImg[randBack].width; 
 	int backgroundH = backgroundImg[randBack].height; 
 	glBindTexture(GL_TEXTURE_2D, gl.backgroundTexture);
@@ -487,7 +475,7 @@ void initOpengl(void)
 				 GL_UNSIGNED_BYTE, img[6].data);
 	glViewport(0, 0, gl.xres, gl.yres);	
 
-	//Anthony 
+	//Anthony Credits Image
 	glGenTextures(1, &gl.anthonyTexture);
 	int anthonyW = img[7].width; 
 	int anthonyH = img[7].height; 
@@ -517,46 +505,55 @@ void initOpengl(void)
 	glTexImage2D(GL_TEXTURE_2D,0,3,healthbarW,healthbarH,0, GL_RGB, GL_UNSIGNED_BYTE, img[8].data);
 	glViewport(0, 0, gl.xres, gl.yres);
 
+	//Arrow Keys
+	glGenTextures(1, &gl.keysTexture);
+	int keyimageW = img[10].width; 
+	int keyimageH = img[10].height; 
+	glBindTexture(GL_TEXTURE_2D, gl.keysTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D,0,3,keyimageW,keyimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[10].data);
+	glViewport(0, 0, gl.xres, gl.yres);
+
 	//Initialize matrices
 	glMatrixMode(GL_PROJECTION); glLoadIdentity();
 	glMatrixMode(GL_MODELVIEW); glLoadIdentity();
+	
 	//This sets 2D mode (no perspective)
 	glOrtho(0, gl.xres, 0, gl.yres, -1, 1);
-	//
 	glDisable(GL_LIGHTING);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_FOG);
 	glDisable(GL_CULL_FACE);
-	//
+	
 	//Clear the screen
 	glClearColor(1.0, 1.0, 1.0, 1.0);
-	//glClear(GL_COLOR_BUFFER_BIT);
+	
 	//Do this to allow fonts
 	glEnable(GL_TEXTURE_2D);
 	initialize_fonts();
-	//
+	
 	//load the images file into a ppm structure.
-	//
 	int w = img[0].width;
 	int h = img[0].height;
-	//
+	
 	//create opengl texture elements
 	glGenTextures(1, &gl.walkTexture);
+	
 	//-------------------------------------------------------------------------
-	//silhouette
+	//	TRANSPARENCY SECTION
+	//-------------------------------------------------------------------------
 	//this is similar to a sprite graphic
-	//
 	glBindTexture(GL_TEXTURE_2D, gl.walkTexture);
-	//
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-	//
+	
 	//must build a new set of data...
 	unsigned char *walkData = buildAlphaData(&img[0]);	
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, walkData);
-	free(walkData);
-
+	free(walkData);		
+	//
 	//HEALTH <3
 	//-------------------------------------------------------------------------
 	//create opengl texture elements
@@ -577,7 +574,7 @@ void initOpengl(void)
 	//create opengl texture elements
 	w = img[8].width;
 	h = img[8].height;
-	glGenTextures(1, &gl.exp.tex);
+	//glGenTextures(1, &gl.exp.tex);
 
 	glBindTexture(GL_TEXTURE_2D, gl.healthbarTexture);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
@@ -586,6 +583,21 @@ void initOpengl(void)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, healthData);
 	free(healthData);
+	//
+	// ARROW KEYS <3
+	//-------------------------------------------------------------------------
+	//create opengl texture elements
+	w = img[10].width;
+	h = img[10].height;
+	glGenTextures(1, &gl.keysTexture);
+
+	glBindTexture(GL_TEXTURE_2D, gl.keysTexture);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	unsigned char *theKeyData = buildAlphaData(&img[10]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, theKeyData);
+	free(theKeyData);
 	//
 	//-------------------------------------------------------------------------
 	//create opengl texture elements
@@ -831,19 +843,16 @@ void physics(void)
 		if (timeSpan > gl.delay) {
 			//advance
 			++gl.walkFrame;
-<<<<<<< HEAD
 			if (gl.walkFrame >= 14)
 				gl.walkFrame -= 14;
 			timers.recordTime(&timers.walkTime);
 		}
 		for (int i=0; i<20; i++) {
-=======
 			if (gl.walkFrame >= 13)
 				gl.walkFrame -= 13;
 			timers.recordTime(&timers.walkTime);
 		}
 		for (int i=7; i<20; i++) {
->>>>>>> c2329e189e133676ff2df0cca7fd8cfcbebeccfd
 			/*if (gl.keys[XK_Left]) {
 				gl.box[i][0] += 1.0 * (0.05 / gl.delay);
 				if (gl.box[i][0] > gl.xres + 10.0)
@@ -851,7 +860,7 @@ void physics(void)
 				gl.camera[0] -= 2.0/lev.tilesize[0] * (0.05 / gl.delay);
 				if (gl.camera[0] < 0.0)
 					gl.camera[0] = 0.0;
-			} else {*/
+			} else { */
 				gl.box[i][0] -= 1.0 * (0.05 / gl.delay);
 				if (gl.box[i][0] < -10.0)
 					gl.box[i][0] += gl.xres + 10.0;
@@ -927,12 +936,12 @@ void render(void)
 	//Clear the screen
 	glClearColor(0.1, 0.1, 0.1, 1.0);
 
-	if (gl.menu) {
+	while (gl.menu) {
 		glClearColor(0.1, 0.1, 0.1, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		extern void titleScreen(int x, int y);
-		titleScreen(100, gl.yres-100);
+		extern void pauseScreen(int x, int y);
+			pauseScreen(100, 	gl.yres-100);
 		return;
 	}
 
@@ -1065,6 +1074,18 @@ void render(void)
 				glEnd();
 				glPopMatrix();
 			}
+			if (lev.arr[row][col] == 'r') {
+				glColor3f(75, 0, 130);
+				glPushMatrix();
+				glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+				glBegin(GL_QUADS);
+					glVertex2i( 0,  0);
+					glVertex2i( 0, ty);
+					glVertex2i(tx, ty);
+					glVertex2i(tx,  0);
+				glEnd();
+				glPopMatrix();
+			}
 			--row;
 		}
 		col = (col+1) % lev.ncols;
@@ -1138,6 +1159,12 @@ void render(void)
 	//Health Bar Text
 	extern void showText(int, int, int, const char*);	
 	showText(50, gl.yres-166, colorFont("white"), "Health");
+	
+	//UI Help UI_Display
+	extern void arrowKeysPicture(int, int, GLuint);
+	extern void Controls_UI(int, int);
+	Controls_UI(620,515);
+	//arrowKeysPicture(500, 500, gl.keysTexture);
 	
 /*	unsigned int c = 0x00ffff44;
 	r.bot = gl.yres - 20;

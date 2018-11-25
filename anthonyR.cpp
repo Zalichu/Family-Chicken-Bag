@@ -9,11 +9,15 @@
 #include <iostream>
 #include "fonts.h"
 #include <GL/glx.h>
+#include "anthonyR.h"
 
 using namespace std;
 
 int colorFont(string);
+void showText(int x, int y, int colorText, const char* text);
 
+/* TEXT FUNCTIONS 
+--------------------------------------------------------------*/
 void showAnthonyName(int x, int y)
 {
 	//Credits
@@ -33,6 +37,7 @@ void showAnthonyName(int x, int y)
 
 void showText(int x, int y, int colorText, const char* text)
 {
+	//TextBox Function
 	Rect credit;
 	credit.bot = y + 50;
 	credit.left = x;
@@ -40,6 +45,8 @@ void showText(int x, int y, int colorText, const char* text)
 	ggprint8b(&credit, 16, colorText, text);
 }
 
+/*	GRAPHICS
+--------------------------------------------------------------*/
 void showAnthonyPicture(int x, int y, GLuint texid)
 {
     glColor3ub(255, 255, 255);
@@ -73,6 +80,23 @@ void showHealthbar(int x, int y, GLuint texid)
     glPopMatrix();
 }
 
+void arrowKeysPicture(int x, int y, GLuint texid)
+{
+    glColor3ub(255, 255, 255);
+    int wid = 80;
+	int height = 80;
+    glPushMatrix();
+    glTranslatef(x, y, 0);
+    glBindTexture(GL_TEXTURE_2D, texid);
+    glBegin(GL_QUADS);
+    	glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -height);
+    	glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, height);
+    	glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, height);
+    	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -height);
+    glEnd();
+    glPopMatrix();
+}
+
 void showHealth(int x, int y, int playerHealth, GLuint texid)
 {
     glColor3ub(255, 255, 255);
@@ -90,7 +114,7 @@ void showHealth(int x, int y, int playerHealth, GLuint texid)
     glPopMatrix();
 }
 
-void titleScreen(int x, int y)
+void pauseScreen(int x, int y)
 {
 	Rect menu;
 	//Play Game Button
@@ -106,9 +130,62 @@ void titleScreen(int x, int y)
 	ggprint8b(&menu, 20, colorFont("white"), "CREDITS");
 }
 
-//Replaces the need to use hex codes
+void Controls_UI(int x, int y) //WIP 
+{	
+	int boxSize = 70;
+	int borderSize = 5;
+
+	//Red Border
+ 	glColor3ub(204, 0, 0);
+    int wid = boxSize + borderSize;
+	int height = boxSize + borderSize;
+    glPushMatrix();
+    glTranslatef(x, y, 0);
+    glBegin(GL_QUADS);
+    	glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -height);
+    	glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, height);
+    	glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, height);
+    	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -height);
+    glEnd();
+    glPopMatrix();
+	//Light Grey Box 
+ 	glColor3ub(160, 160, 160);
+    wid -= borderSize;
+	height -= borderSize;
+    glPushMatrix();
+    glTranslatef(x, y, 0);
+    glBegin(GL_QUADS);
+    	glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -height);
+    	glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, height);
+    	glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, height);
+    	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -height);
+    glEnd();
+    glPopMatrix();	
+	//Score Box
+ 	glColor3ub(96, 96, 96);
+    wid = wid;
+	height = 25;
+    glPushMatrix();
+    glTranslatef(x, y-45, 0);
+    glBegin(GL_QUADS);
+    	glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -height);
+    	glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, height);
+    	glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, height);
+    	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -height);
+    glEnd();
+    glPopMatrix();	
+	showText(x-52, y-90, colorFont("green"), "SCORE: ");
+	//showText(int x, int y, int colorText, const char* text)
+	showText(x-52, y-8, colorFont("yellow"), "Q | Kick");
+	showText(x-52, y-28, colorFont("yellow"), "R | Punch");
+	showText(x-52, y-48, colorFont("yellow"), "Space | Jump");
+}
+
+/* MISC. FUNCTIONS
+--------------------------------------------------------------*/
 int colorFont(string colorChoice)
 {
+	//Replaces the need to use hex codes
 	if (colorChoice == "red") {
 		return 0xff0000;
 	}
