@@ -65,7 +65,7 @@ public:
 	int xres, yres;
 	int movie, movieStep;
 	int walk;
-    int punch;
+    	int punch;
 	int walkFrame;
 	double delay;
 	bool credits; //Added
@@ -88,6 +88,7 @@ public:
 	GLuint backgroundTexture;
 	GLuint healthbarTexture;	
 	GLuint healthTexture;
+	GLuint keysTexture;
 
 	~Global();
 	Global();
@@ -101,7 +102,7 @@ public:
 	Flt ftsz[2];
 	Flt tile_base;
 
-    Level();
+    	Level();
 	void removeCrLf(char *str);
 } lev;
 
@@ -131,7 +132,7 @@ public:
 	Image(const char *fname);
 };
 
-Image img[10] = {
+Image img[11] = {
 "./images/walk.gif",
 "./images/exp.png",
 "./images/exp44.png",
@@ -141,7 +142,9 @@ Image img[10] = {
 "./images/KFC.png", 
 "./images/anthony.jpg",
 "./images/objects/HealthBarUI.png",
-"./images/objects/health.png"};
+"./images/objects/health.png",
+"./images/objects/arrowKeys.png"
+};
 
 Image backgroundImg[2] = { 
 "./images/background/clam-parking.jpg", 
