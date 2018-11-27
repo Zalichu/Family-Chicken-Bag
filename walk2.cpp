@@ -1,11 +1,11 @@
 /*	Modified by: Family-Chicken-Bag Team : Anthony | Emmanuel | Cleo | Mohammed 
-	Original Author: Gordon Griesel
+    Original Author: Gordon Griesel
 
-	This program includes:
-	multiple sprite-sheet animations
-	a level tiling system
-	parallax scrolling of backgrounds
-	*/
+    This program includes:
+    multiple sprite-sheet animations
+    a level tiling system
+    parallax scrolling of backgrounds
+    */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,6 +22,30 @@
 #include "anthonyR.h"
 #include "global.h"
 
+Timers timers;
+Global gl;
+Level lev;
+X11_wrapper x11;
+
+Image img[11] = {
+"./images/walk.gif",
+"./images/exp.png",
+"./images/exp44.png",
+"./images/tiger.jpg",
+"./images/subaru.jpg",
+"./images/dog.jpg",
+"./images/KFC.png",
+"./images/anthony.jpg",
+"./images/objects/HealthBarUI.png",
+"./images/objects/health.png",
+"./images/objects/arrowKeys.png"
+};
+
+Image backgroundImg[2] = {
+"./images/background/clam-parking.jpg",
+"./images/background/clam-noparking.gif"
+};
+
 typedef double Flt;
 typedef double Vec[3];
 typedef Flt	Matrix[4][4];
@@ -33,7 +57,7 @@ typedef Flt	Matrix[4][4];
 #define VecCopy(a,b) (b)[0]=(a)[0];(b)[1]=(a)[1];(b)[2]=(a)[2]
 #define VecDot(a,b)	((a)[0]*(b)[0]+(a)[1]*(b)[1]+(a)[2]*(b)[2])
 #define VecSub(a,b,c) (c)[0]=(a)[0]-(b)[0]; \
-			     (c)[1]=(a)[1]-(b)[1]; \
+                             (c)[1]=(a)[1]-(b)[1]; \
 (c)[2]=(a)[2]-(b)[2]
 const float timeslice = 1.0f;
 const float gravity = -0.2f;
@@ -47,14 +71,14 @@ void physics();
 void render();
 
 /*	SETUP TIMERS
-	-----------------------------------------------------------------------------*/
+    -----------------------------------------------------------------------------*/
 Timers::Timers() {
     physicsRate = 1.0 / 30.0;
     oobillion = 1.0 / 1e9;
 }
 double Timers::timeDiff(struct timespec *start, struct timespec *end) {
     return (double)(end->tv_sec - start->tv_sec ) +
-	(double)(end->tv_nsec - start->tv_nsec) * oobillion;
+        (double)(end->tv_nsec - start->tv_nsec) * oobillion;
 }
 void Timers::timeCopy(struct timespec *dest, struct timespec *source) {
     memcpy(dest, source, sizeof(struct timespec));
@@ -108,9 +132,9 @@ Global::Global() {
     exp44.image=NULL;
     exp44.delay = 0.022;
     for (int i=0; i<20; i++) {
-	box[i][0] = rnd() * xres;
-	box[i][1] = rnd() * (yres-220) + 270; //Image Movement
-	box[i][2] = 0.0;
+        box[i][0] = rnd() * xres;
+        box[i][1] = rnd() * (yres-220) + 270; //Image Movement
+        box[i][2] = 0.0;
     }
     memset(keys, 0, 65536);
 }
@@ -124,37 +148,37 @@ Level::Level() {
     //read level
     FILE *fpi = fopen("level1.txt","r");
     if (fpi) {
-	nrows=0;
-	char line[100];
-	while (fgets(line, 100, fpi) != NULL) {
-	    removeCrLf(line);
-	    int slen = strlen(line);
-	    ncols = slen;
-	    //Log("line: %s\n", line);
-	    for (int j=0; j<slen; j++) {
-		arr[nrows][j] = line[j];
-	    }
-	    ++nrows;
-	}
-	fclose(fpi);
-	//printf("nrows of background data: %i\n", nrows);
+        nrows=0;
+        char line[100];
+        while (fgets(line, 100, fpi) != NULL) {
+            removeCrLf(line);
+            int slen = strlen(line);
+            ncols = slen;
+            //Log("line: %s\n", line);
+            for (int j=0; j<slen; j++) {
+                arr[nrows][j] = line[j];
+            }
+            ++nrows;
+        }
+        fclose(fpi);
+        //printf("nrows of background data: %i\n", nrows);
     }
     for (int i=0; i<nrows; i++) {
-	for (int j=0; j<ncols; j++) {
-	    printf("%c", arr[i][j]);
-	}
-	printf("\n");
+        for (int j=0; j<ncols; j++) {
+            printf("%c", arr[i][j]);
+        }
+        printf("\n");
     }
 }
 void Level::removeCrLf(char *str) {
     //remove carriage return and linefeed from a Cstring
     char *p = str;
     while (*p) {
-	if (*p == 10 || *p == 13) {
-	    *p = '\0';
-	    break;
-	}
-	++p;
+        if (*p == 10 || *p == 13) {
+            *p = '\0';
+            break;
+        }
+        ++p;
     }
 }
 
@@ -179,22 +203,22 @@ X11_wrapper::X11_wrapper() {
     setupScreenRes(gl.xres, gl.yres);
     dpy = XOpenDisplay(NULL);
     if (dpy == NULL) {
-	printf("\n\tcannot connect to X server\n\n");
-	exit(EXIT_FAILURE);
+        printf("\n\tcannot connect to X server\n\n");
+        exit(EXIT_FAILURE);
     }
     Window root = DefaultRootWindow(dpy);
     XVisualInfo *vi = glXChooseVisual(dpy, 0, att);
     if (vi == NULL) {
-	printf("\n\tno appropriate visual found\n\n");
-	exit(EXIT_FAILURE);
+        printf("\n\tno appropriate visual found\n\n");
+        exit(EXIT_FAILURE);
     } 
     Colormap cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
     swa.colormap = cmap;
     swa.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask |
-	StructureNotifyMask | SubstructureNotifyMask;
+        StructureNotifyMask | SubstructureNotifyMask;
     win = XCreateWindow(dpy, root, 0, 0, gl.xres, gl.yres, 0,
-	    vi->depth, InputOutput, vi->visual,
-	    CWColormap | CWEventMask, &swa);
+            vi->depth, InputOutput, vi->visual,
+            CWColormap | CWEventMask, &swa);
     GLXContext glc = glXCreateContext(dpy, vi, NULL, GL_TRUE);
     glXMakeCurrent(dpy, win, glc);
     setTitle();
@@ -212,11 +236,11 @@ void X11_wrapper::checkResize(XEvent *e) {
     //The ConfigureNotify is sent by the
     //server if the window is resized.
     if (e->type != ConfigureNotify)
-	return;
+        return;
     XConfigureEvent xce = e->xconfigure;
     if (xce.width != gl.xres || xce.height != gl.yres) {
-	//Window size did change.
-	reshapeWindow(xce.width, xce.height);
+        //Window size did change.
+        reshapeWindow(xce.width, xce.height);
     }
 }
 bool X11_wrapper::getXPending() {
@@ -234,7 +258,7 @@ void X11_wrapper::swapBuffers() {
 Image::~Image() { delete [] data; }
 Image::Image(const char *fname) {
     if (fname[0] == '\0')
-	return;
+        return;
     //printf("fname **%s**\n", fname);
     int ppmFlag = 0;
     char name[40];
@@ -242,44 +266,44 @@ Image::Image(const char *fname) {
     int slen = strlen(name);
     char ppmname[80];
     if (strncmp(name+(slen-4), ".ppm", 4) == 0)
-	ppmFlag = 1;
+        ppmFlag = 1;
     if (ppmFlag) {
-	strcpy(ppmname, name);
+        strcpy(ppmname, name);
     } else {
-	name[slen-4] = '\0';
-	//printf("name **%s**\n", name);
-	sprintf(ppmname,"%s.ppm", name);
-	//printf("ppmname **%s**\n", ppmname);
+        name[slen-4] = '\0';
+        //printf("name **%s**\n", name);
+        sprintf(ppmname,"%s.ppm", name);
+        //printf("ppmname **%s**\n", ppmname);
 
-	char ts[100];
-	//system("convert eball.jpg eball.ppm");
-	sprintf(ts, "convert %s %s", fname, ppmname);
-	system(ts);
+        char ts[100];
+        //system("convert eball.jpg eball.ppm");
+        sprintf(ts, "convert %s %s", fname, ppmname);
+        system(ts);
     }
     //sprintf(ts, "%s", name);
     //printf("read ppm **%s**\n", ppmname); fflush(stdout);
     FILE *fpi = fopen(ppmname, "r");
     if (fpi) {
-	char line[200];
-	fgets(line, 200, fpi);
-	fgets(line, 200, fpi);
-	//skip comments and blank lines
-	while (line[0] == '#' || strlen(line) < 2)
-	    fgets(line, 200, fpi);
-	sscanf(line, "%i %i", &width, &height);
-	fgets(line, 200, fpi);
-	//get pixel data
-	int n = width * height * 3;			
-	data = new unsigned char[n];			
-	for (int i=0; i<n; i++)
-	    data[i] = fgetc(fpi);
-	fclose(fpi);
+        char line[200];
+        fgets(line, 200, fpi);
+        fgets(line, 200, fpi);
+        //skip comments and blank lines
+        while (line[0] == '#' || strlen(line) < 2)
+            fgets(line, 200, fpi);
+        sscanf(line, "%i %i", &width, &height);
+        fgets(line, 200, fpi);
+        //get pixel data
+        int n = width * height * 3;			
+        data = new unsigned char[n];			
+        for (int i=0; i<n; i++)
+            data[i] = fgetc(fpi);
+        fclose(fpi);
     } else {
-	printf("ERROR opening image: %s\n",ppmname);
-	exit(0);
+        printf("ERROR opening image: %s\n",ppmname);
+        exit(0);
     }
     if (!ppmFlag)
-	unlink(ppmname);
+        unlink(ppmname);
 }
 
 int main(void)
@@ -289,15 +313,15 @@ int main(void)
     init();
     int done = 0;
     while (!done) {
-	while (x11.getXPending()) {
-	    XEvent e = x11.getXNextEvent();
-	    x11.checkResize(&e);
-	    checkMouse(&e);
-	    done = checkKeys(&e);
-	}
-	physics();
-	render();
-	x11.swapBuffers();
+        while (x11.getXPending()) {
+            XEvent e = x11.getXNextEvent();
+            x11.checkResize(&e);
+            checkMouse(&e);
+            done = checkKeys(&e);
+        }
+        physics();
+        render();
+        x11.swapBuffers();
     }
     cleanup_fonts();
     return 0;
@@ -316,18 +340,18 @@ unsigned char *buildAlphaData(Image *img)
     unsigned char t1 = *(data+1);
     unsigned char t2 = *(data+2);
     for (int i=0; i<img->width * img->height * 3; i+=3) {
-	a = *(data+0);
-	b = *(data+1);
-	c = *(data+2);
-	*(ptr+0) = a;
-	*(ptr+1) = b;
-	*(ptr+2) = c;
-	*(ptr+3) = 1;
-	if (a==t0 && b==t1 && c==t2)
-	    *(ptr+3) = 0;
-	//-----------------------------------------------
-	ptr += 4;
-	data += 3;
+        a = *(data+0);
+        b = *(data+1);
+        c = *(data+2);
+        *(ptr+0) = a;
+        *(ptr+1) = b;
+        *(ptr+2) = c;
+        *(ptr+3) = 1;
+        if (a==t0 && b==t1 && c==t2)
+            *(ptr+3) = 0;
+        //-----------------------------------------------
+        ptr += 4;
+        data += 3;
     }
     return newdata;
 }
@@ -363,7 +387,7 @@ void initOpengl(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, 3, subaruW, subaruH, 0, GL_RGB,
-	    GL_UNSIGNED_BYTE, img[4].data);
+            GL_UNSIGNED_BYTE, img[4].data);
     glViewport(0, 0, gl.xres, gl.yres);	
 
     //DOG
@@ -374,7 +398,7 @@ void initOpengl(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, 3, dogW, dogH, 0, GL_RGB,
-	    GL_UNSIGNED_BYTE, img[5].data);
+            GL_UNSIGNED_BYTE, img[5].data);
     glViewport(0, 0, gl.xres, gl.yres);	
 
     //KFC
@@ -385,7 +409,7 @@ void initOpengl(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, 3, kfcW, kfcH, 0, GL_RGB,
-	    GL_UNSIGNED_BYTE, img[6].data);
+            GL_UNSIGNED_BYTE, img[6].data);
     glViewport(0, 0, gl.xres, gl.yres);	
 
     //Anthony Credits Image
@@ -464,7 +488,7 @@ void initOpengl(void)
     //must build a new set of data...
     unsigned char *walkData = buildAlphaData(&img[0]);	
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
-	    GL_RGBA, GL_UNSIGNED_BYTE, walkData);
+            GL_RGBA, GL_UNSIGNED_BYTE, walkData);
     free(walkData);		
     //
     //HEALTH <3
@@ -479,7 +503,7 @@ void initOpengl(void)
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     unsigned char *healtherData = buildAlphaData(&img[9]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
-	    GL_RGBA, GL_UNSIGNED_BYTE, healtherData);
+            GL_RGBA, GL_UNSIGNED_BYTE, healtherData);
     free(healtherData);
     //
     //HEALTH BAR
@@ -494,7 +518,7 @@ void initOpengl(void)
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     unsigned char *healthData = buildAlphaData(&img[8]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
-	    GL_RGBA, GL_UNSIGNED_BYTE, healthData);
+            GL_RGBA, GL_UNSIGNED_BYTE, healthData);
     free(healthData);
     //
     // ARROW KEYS <3
@@ -509,7 +533,7 @@ void initOpengl(void)
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     unsigned char *theKeyData = buildAlphaData(&img[10]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
-	    GL_RGBA, GL_UNSIGNED_BYTE, theKeyData);
+            GL_RGBA, GL_UNSIGNED_BYTE, theKeyData);
     free(theKeyData);
     //
     //-------------------------------------------------------------------------
@@ -525,7 +549,7 @@ void initOpengl(void)
     //must build a new set of data...
     unsigned char *xData = buildAlphaData(&img[1]);	
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
-	    GL_RGBA, GL_UNSIGNED_BYTE, xData);
+            GL_RGBA, GL_UNSIGNED_BYTE, xData);
     free(xData);
     //-------------------------------------------------------------------------
     w = img[2].width;
@@ -540,7 +564,7 @@ void initOpengl(void)
     //must build a new set of data...
     xData = buildAlphaData(&img[2]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
-	    GL_RGBA, GL_UNSIGNED_BYTE, xData);
+            GL_RGBA, GL_UNSIGNED_BYTE, xData);
     free(xData);
 }
 
@@ -557,25 +581,25 @@ void checkMouse(XEvent *e)
     static int savey = 0;
     //
     if (e->type != ButtonRelease && e->type != ButtonPress &&
-	    e->type != MotionNotify)
-	return;
+            e->type != MotionNotify)
+        return;
     if (e->type == ButtonRelease) {
-	return;
+        return;
     }
     if (e->type == ButtonPress) {
-	if (e->xbutton.button==1) {
-	    //Left button is down
-	}
-	if (e->xbutton.button==3) {
-	    //Right button is down
-	}
+        if (e->xbutton.button==1) {
+            //Left button is down
+        }
+        if (e->xbutton.button==3) {
+            //Right button is down
+        }
     }
     if (e->type == MotionNotify) {
-	if (savex != e->xbutton.x || savey != e->xbutton.y) {
-	    //Mouse moved
-	    savex = e->xbutton.x;
-	    savey = e->xbutton.y;
-	}
+        if (savex != e->xbutton.x || savey != e->xbutton.y) {
+            //Mouse moved
+            savex = e->xbutton.x;
+            savey = e->xbutton.y;
+        }
     }
 }
 
@@ -584,8 +608,8 @@ void screenCapture()
     static int fnum = 0;
     static int vid = 0;
     if (!vid) {
-	system("mkdir ./vid");
-	vid = 1;
+        system("mkdir ./vid");
+        vid = 1;
     }
     unsigned char *data = (unsigned char *)malloc(gl.xres * gl.yres * 3);
     glReadPixels(0, 0, gl.xres, gl.yres, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -593,24 +617,24 @@ void screenCapture()
     sprintf(ts, "./vid/pic%03i.ppm", fnum);
     FILE *fpo = fopen(ts,"w");	
     if (fpo) {
-	fprintf(fpo, "P6\n%i %i\n255\n", gl.xres, gl.yres);
-	unsigned char *p = data;
-	//go backwards a row at a time...
-	p = p + ((gl.yres-1) * gl.xres * 3);
-	unsigned char *start = p;
-	for (int i=0; i<gl.yres; i++) {
-	    for (int j=0; j<gl.xres*3; j++) {
-		fprintf(fpo, "%c",*p);
-		++p;
-	    }
-	    start = start - (gl.xres*3);
-	    p = start;
-	}
-	fclose(fpo);
-	char s[256];
-	sprintf(s, "convert ./vid/pic%03i.ppm ./vid/pic%03i.gif", fnum, fnum);
-	system(s);
-	unlink(ts);
+        fprintf(fpo, "P6\n%i %i\n255\n", gl.xres, gl.yres);
+        unsigned char *p = data;
+        //go backwards a row at a time...
+        p = p + ((gl.yres-1) * gl.xres * 3);
+        unsigned char *start = p;
+        for (int i=0; i<gl.yres; i++) {
+            for (int j=0; j<gl.xres*3; j++) {
+                fprintf(fpo, "%c",*p);
+                ++p;
+            }
+            start = start - (gl.xres*3);
+            p = start;
+        }
+        fclose(fpo);
+        char s[256];
+        sprintf(s, "convert ./vid/pic%03i.ppm ./vid/pic%03i.gif", fnum, fnum);
+        system(s);
+        unlink(ts);
     }
     ++fnum;
 }
@@ -620,79 +644,79 @@ int checkKeys(XEvent *e)
     //keyboard input?
     static int shift=0;
     if (e->type != KeyPress && e->type != KeyRelease)
-	return 0;
+        return 0;
     int key = XLookupKeysym(&e->xkey, 0);
     gl.keys[key]=1;
     if (e->type == KeyRelease) {
-	gl.keys[key]=0;
-	if (key == XK_Shift_L || key == XK_Shift_R)
-	    shift=0;
-	return 0;
+        gl.keys[key]=0;
+        if (key == XK_Shift_L || key == XK_Shift_R)
+            shift=0;
+        return 0;
     }
     gl.keys[key]=1;
     if (key == XK_Shift_L || key == XK_Shift_R) {
-	shift=1;
-	return 0;
+        shift=1;
+        return 0;
     }
     (void)shift;
     switch (key) {
-	case XK_s:
-	    screenCapture();
-	    break;
-	case XK_m:
-	    gl.movie ^= 1;
-	    break;
-	case XK_w:
-	    timers.recordTime(&timers.walkTime);
-	    gl.walk ^= 1;
-	    break;
-	case XK_e:
-	    gl.exp.pos[0] = 200.0;
-	    gl.exp.pos[1] = -60.0;
-	    gl.exp.pos[2] =   0.0;
-	    timers.recordTime(&gl.exp.time);
-	    gl.exp.onoff ^= 1;
-	    break;
-	case XK_f:
-	    gl.exp44.pos[0] = 200.0;
-	    gl.exp44.pos[1] = -60.0;
-	    gl.exp44.pos[2] =   0.0;
-	    timers.recordTime(&gl.exp44.time);
-	    gl.exp44.onoff ^= 1;
-	    break;
-	    //Credits
-	case XK_c:
-	    gl.credits ^= 1; 
-	    break;
-	case XK_r:
-	    gl.punch ^= 1;
-	    break;
-	    //Menu
-	case XK_p:
-	    gl.menu ^= 1;
-	    break;
-	case XK_b:
-	    gl.background ^= 1;
-	    break;
-	case XK_Left:
-	    break;
-	case XK_Right:
-	    break;
-	case XK_Up:
-	    break;
-	case XK_Down:
-	    break;
-	case XK_equal:
-	    gl.delay -= 0.005;
-	    if (gl.delay < 0.005)
-		gl.delay = 0.005;
-	    break;
-	case XK_minus:
-	    gl.delay += 0.005;
-	    break;
-	case XK_Escape:
-	    return 1;
-	    break;
+        case XK_s:
+            screenCapture();
+            break;
+        case XK_m:
+            gl.movie ^= 1;
+            break;
+        case XK_w:
+            timers.recordTime(&timers.walkTime);
+            gl.walk ^= 1;
+            break;
+        case XK_e:
+            gl.exp.pos[0] = 200.0;
+            gl.exp.pos[1] = -60.0;
+            gl.exp.pos[2] =   0.0;
+            timers.recordTime(&gl.exp.time);
+            gl.exp.onoff ^= 1;
+            break;
+        case XK_f:
+            gl.exp44.pos[0] = 200.0;
+            gl.exp44.pos[1] = -60.0;
+            gl.exp44.pos[2] =   0.0;
+            timers.recordTime(&gl.exp44.time);
+            gl.exp44.onoff ^= 1;
+            break;
+            //Credits
+        case XK_c:
+            gl.credits ^= 1; 
+            break;
+        case XK_r:
+            gl.punch ^= 1;
+            break;
+            //Menu
+        case XK_p:
+            gl.menu ^= 1;
+            break;
+        case XK_b:
+            gl.background ^= 1;
+            break;
+        case XK_Left:
+            break;
+        case XK_Right:
+            break;
+        case XK_Up:
+            break;
+        case XK_Down:
+            break;
+        case XK_equal:
+            gl.delay -= 0.005;
+            if (gl.delay < 0.005)
+                gl.delay = 0.005;
+            break;
+        case XK_minus:
+            gl.delay += 0.005;
+            break;
+        case XK_Escape:
+            return 1;
+            break;
     }
     return 0;
 }
@@ -705,8 +729,8 @@ Flt VecNormalize(Vec vec)
     Flt zlen = vec[2];
     len = xlen*xlen + ylen*ylen + zlen*zlen;
     if (len == 0.0) {
-	MakeVector(vec, 0.0, 0.0, 1.0);
-	return 1.0;
+        MakeVector(vec, 0.0, 0.0, 1.0);
+        return 1.0;
     }
     len = sqrt(len);
     tlen = 1.0 / len;
@@ -719,373 +743,368 @@ Flt VecNormalize(Vec vec)
 void physics(void)
 {
     if (gl.walk || gl.keys[XK_Right] || gl.keys[XK_Left]) {
-	//man is walking...
-	//when time is up, advance the frame.
-	timers.recordTime(&timers.timeCurrent);
-	double timeSpan = timers.timeDiff(&timers.walkTime, &timers.timeCurrent);
-	if (timeSpan > gl.delay) {
-	    //advance
-	    ++gl.walkFrame;
-	    if (gl.walkFrame >= 7)
-		gl.walkFrame -= 7;
-	    timers.recordTime(&timers.walkTime);
-	}
-	for (int i=0; i<20; i++) {
-	    if (gl.keys[XK_Left]) {
-		gl.box[i][0] += 1.0 * (0.05 / gl.delay);
-		if (gl.box[i][0] > gl.xres + 10.0)
-		    gl.box[i][0] -= gl.xres + 10.0;
-		gl.camera[0] -= 2.0/lev.tilesize[0] * (0.05 / gl.delay);
-		if (gl.camera[0] < 0.0)
-		    gl.camera[0] = 0.0;
-	    } else {
-		gl.box[i][0] -= 1.0 * (0.05 / gl.delay);
-		if (gl.box[i][0] < -10.0)
-		    gl.box[i][0] += gl.xres + 10.0;
-		gl.camera[0] += 2.0/lev.tilesize[0] * (0.05 / gl.delay);
-		if (gl.camera[0] < 0.0)
-		    gl.camera[0] = 0.0;
-	    }
-	}
+        //man is walking...
+        //when time is up, advance the frame.
+        timers.recordTime(&timers.timeCurrent);
+        double timeSpan = timers.timeDiff(&timers.walkTime, &timers.timeCurrent);
+        if (timeSpan > gl.delay) {
+            //advance
+            ++gl.walkFrame;
+            if (gl.walkFrame >= 7)
+                gl.walkFrame -= 7;
+            timers.recordTime(&timers.walkTime);
+        }
+        for (int i=0; i<20; i++) {
+            if (gl.keys[XK_Left]) {
+                gl.box[i][0] += 1.0 * (0.05 / gl.delay);
+                if (gl.box[i][0] > gl.xres + 10.0)
+                    gl.box[i][0] -= gl.xres + 10.0;
+                gl.camera[0] -= 2.0/lev.tilesize[0] * (0.05 / gl.delay);
+                if (gl.camera[0] < 0.0)
+                    gl.camera[0] = 0.0;
+            } else {
+                gl.box[i][0] -= 1.0 * (0.05 / gl.delay);
+                if (gl.box[i][0] < -10.0)
+                    gl.box[i][0] += gl.xres + 10.0;
+                gl.camera[0] += 2.0/lev.tilesize[0] * (0.05 / gl.delay);
+                if (gl.camera[0] < 0.0)
+                    gl.camera[0] = 0.0;
+            }
+        }
     }
     if (gl.punch){
-	//man is walking...
-	//when time is up, advance the frame.
-	timers.recordTime(&timers.timeCurrent);
-	double timeSpan = timers.timeDiff(&timers.walkTime, &timers.timeCurrent);
-	if (timeSpan > gl.delay) {
-	    //advance
-	    ++gl.walkFrame;
-	    if (gl.walkFrame >= 14)
-		gl.walkFrame -= 14;
-	    timers.recordTime(&timers.walkTime);
-	}
-	for (int i=0; i<20; i++) {
-	    /*if (gl.keys[XK_Left]) {
-	      gl.box[i][0] += 1.0 * (0.05 / gl.delay);
-	      if (gl.box[i][0] > gl.xres + 10.0)
-	      gl.box[i][0] -= gl.xres + 10.0;
-	      gl.camera[0] -= 2.0/lev.tilesize[0] * (0.05 / gl.delay);
-	      if (gl.camera[0] < 0.0)
-	      gl.camera[0] = 0.0;
-	      } else { */
-	    gl.box[i][0] -= 1.0 * (0.05 / gl.delay);
-	    if (gl.box[i][0] < -10.0)
-		gl.box[i][0] += gl.xres + 10.0;
-	    gl.camera[0] += 2.0/lev.tilesize[0] * (0.05 / gl.delay);
-	    if (gl.camera[0] < 0.0)
-		gl.camera[0] = 0.0;
-	}
-	}
-	if (gl.exp.onoff) {
-	    gl.exp.pos[0] -= 2.0 * (0.05 / gl.delay);
-	}
-	if (gl.exp44.onoff) {
-	    gl.exp44.pos[0] -= 2.0 * (0.05 / gl.delay);
-	}
+        extern void showPunch();
+        showPunch();
+        /*
+        //man is walking...
+        //when time is up, advance the frame.
+        timers.recordTime(&timers.timeCurrent);
+        double timeSpan = timers.timeDiff(&timers.walkTime, &timers.timeCurrent);
+        if (timeSpan > gl.delay) {
+            //advance
+            ++gl.walkFrame;
+            if (gl.walkFrame >= 14)
+                gl.walkFrame -= 14;
+            timers.recordTime(&timers.walkTime);
+        }
+        for (int i=0; i<20; i++) {
+            gl.box[i][0] -= 1.0 * (0.05 / gl.delay);
+            if (gl.box[i][0] < -10.0)
+                gl.box[i][0] += gl.xres + 10.0;
+            gl.camera[0] += 2.0/lev.tilesize[0] * (0.05 / gl.delay);
+            if (gl.camera[0] < 0.0)
+                gl.camera[0] = 0.0;
+        }
+        if (gl.exp.onoff) {
+            gl.exp.pos[0] -= 2.0 * (0.05 / gl.delay);
+        }
+        if (gl.exp44.onoff) {
+            gl.exp44.pos[0] -= 2.0 * (0.05 / gl.delay);
+        }
+        */
+    }
+    if (gl.exp.onoff) {
+        //explosion is happening
+        timers.recordTime(&timers.timeCurrent);
+        double timeSpan = timers.timeDiff(&gl.exp.time, &timers.timeCurrent);
+        if (timeSpan > gl.exp.delay) {
+            //advance explosion frame
+            ++gl.exp.frame;
+            if (gl.exp.frame >= 23) {
+                //explosion is done.
+                gl.exp.onoff = 0;
+                gl.exp.frame = 0;
+            } else {
+                timers.recordTime(&gl.exp.time);
+            }
+        }
+    }
+    if (gl.exp44.onoff) {
+        //explosion is happening
+        timers.recordTime(&timers.timeCurrent);
+        double timeSpan = timers.timeDiff(&gl.exp44.time, &timers.timeCurrent);
+        if (timeSpan > gl.exp44.delay) {
+            //advance explosion frame
+            ++gl.exp44.frame;
+            if (gl.exp44.frame >= 16) {
+                //explosion is done.
+                gl.exp44.onoff = 0;
+                gl.exp44.frame = 0;
+            } else {
+                timers.recordTime(&gl.exp44.time);
+            }
+        }
+    }
+    //====================================
+    //Adjust position of ball.
+    //Height of highest tile when ball is?
+    //====================================
+    Flt dd = lev.ftsz[0];
+    int col = (int)((gl.camera[0]+gl.ball_pos[0]) / dd);
+    col = col % lev.ncols;
+    int hgt = 0;
+    for (int i=0; i<lev.nrows; i++) {
+        if (lev.arr[i][col] != ' ') {
+            hgt = (lev.nrows-i) * lev.tilesize[1];
+            break;
+        }
+    }
+    if (gl.ball_pos[1] < (Flt)hgt) {
+        gl.ball_pos[1] = (Flt)hgt;
+        MakeVector(gl.ball_vel, 0, 0, 0);
+    } else {
+        gl.ball_vel[1] -= 0.9;
+    }
+    gl.ball_pos[1] += gl.ball_vel[1];
 
-	if (gl.exp.onoff) {
-	    //explosion is happening
-	    timers.recordTime(&timers.timeCurrent);
-	    double timeSpan = timers.timeDiff(&gl.exp.time, &timers.timeCurrent);
-	    if (timeSpan > gl.exp.delay) {
-		//advance explosion frame
-		++gl.exp.frame;
-		if (gl.exp.frame >= 23) {
-		    //explosion is done.
-		    gl.exp.onoff = 0;
-		    gl.exp.frame = 0;
-		} else {
-		    timers.recordTime(&gl.exp.time);
-		}
-	    }
-	}
-	if (gl.exp44.onoff) {
-	    //explosion is happening
-	    timers.recordTime(&timers.timeCurrent);
-	    double timeSpan = timers.timeDiff(&gl.exp44.time, &timers.timeCurrent);
-	    if (timeSpan > gl.exp44.delay) {
-		//advance explosion frame
-		++gl.exp44.frame;
-		if (gl.exp44.frame >= 16) {
-		    //explosion is done.
-		    gl.exp44.onoff = 0;
-		    gl.exp44.frame = 0;
-		} else {
-		    timers.recordTime(&gl.exp44.time);
-		}
-	    }
-	}
-	//====================================
-	//Adjust position of ball.
-	//Height of highest tile when ball is?
-	//====================================
-	Flt dd = lev.ftsz[0];
-	int col = (int)((gl.camera[0]+gl.ball_pos[0]) / dd);
-	col = col % lev.ncols;
-	int hgt = 0;
-	for (int i=0; i<lev.nrows; i++) {
-	    if (lev.arr[i][col] != ' ') {
-		hgt = (lev.nrows-i) * lev.tilesize[1];
-		break;
-	    }
-	}
-	if (gl.ball_pos[1] < (Flt)hgt) {
-	    gl.ball_pos[1] = (Flt)hgt;
-	    MakeVector(gl.ball_vel, 0, 0, 0);
-	} else {
-	    gl.ball_vel[1] -= 0.9;
-	}
-	gl.ball_pos[1] += gl.ball_vel[1];
+}
+void render(void)
+{
+    //Clear the screen
+    glClearColor(0.1, 0.1, 0.1, 1.0);
+
+    while (gl.menu) {
+        glClearColor(0.1, 0.1, 0.1, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        extern void pauseScreen(int x, int y);
+        pauseScreen(100, 	gl.yres-100);
+        return;
     }
 
-    void render(void)
-    {
-	//Clear the screen
-	glClearColor(0.1, 0.1, 0.1, 1.0);
+    if (gl.credits) {
+        glClearColor(0.1, 0.1, 0.1, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT);
+        //show boxes as background
+        for (int i=0; i<20; i++) {
+            glPushMatrix();
+            glTranslated(gl.box[i][0],gl.box[i][1],gl.box[i][2]);
+            glColor3f(0.2, 0.2, 0.2);
+            glBegin(GL_QUADS);
+            glVertex2i( 0,  0);
+            glVertex2i( 0, 30);
+            glVertex2i(20, 30);
+            glVertex2i(20,  0);
+            glEnd();
+            glPopMatrix();
+        }
+        //Prototypes:
+        extern void showAnthonyName(int x, int y);
+        extern void showMohammedName(int x, int y);
+        extern void showCleoName(int x, int y);
+        extern void showMasonName(int x, int y);
+        extern void showEmmanuelName(int x, int y);
 
-	while (gl.menu) {
-	    glClearColor(0.1, 0.1, 0.1, 1.0);
-	    glClear(GL_COLOR_BUFFER_BIT);
+        extern void showMohammedPicture(int x , int y, GLuint);
+        extern void showMasonPicture(int, int, GLuint);
+        extern void showCleoPicture(int, int, GLuint);
+        extern void showEmmanuelPic(int, int, GLuint);
+        extern void showAnthonyPicture(int, int, GLuint);
 
-	    extern void pauseScreen(int x, int y);
-	    pauseScreen(100, 	gl.yres-100);
-	    return;
-	}
+        //Function Calls:
+        showAnthonyName(100, gl.yres-100);
+        showMohammedName(100, gl.yres-200);
+        showCleoName(100, gl.yres-300);
+        showMasonName(100, gl.yres-400);
+        showEmmanuelName(100, gl.yres-500);
 
-	if (gl.credits) {
-	    glClearColor(0.1, 0.1, 0.1, 1.0);
-	    glClear(GL_COLOR_BUFFER_BIT);
-	    //show boxes as background
-	    for (int i=0; i<20; i++) {
-		glPushMatrix();
-		glTranslated(gl.box[i][0],gl.box[i][1],gl.box[i][2]);
-		glColor3f(0.2, 0.2, 0.2);
-		glBegin(GL_QUADS);
-		glVertex2i( 0,  0);
-		glVertex2i( 0, 30);
-		glVertex2i(20, 30);
-		glVertex2i(20,  0);
-		glEnd();
-		glPopMatrix();
-	    }
-	    //Prototypes:
-	    extern void showAnthonyName(int x, int y);
-	    extern void showMohammedName(int x, int y);
-	    extern void showCleoName(int x, int y);
-	    extern void showMasonName(int x, int y);
-	    extern void showEmmanuelName(int x, int y);
+        showMohammedPicture(300, 400, gl.tigerTexture);
+        showCleoPicture(300, 300, gl.kfcTexture);
+        showMasonPicture(300, 200, gl.subaruTexture);
+        showEmmanuelPic(300, 100, gl.dogTexture);
+        showAnthonyPicture(300, 500, gl.anthonyTexture);
+        return;
+    }
 
-	    extern void showMohammedPicture(int x , int y, GLuint);
-	    extern void showMasonPicture(int, int, GLuint);
-	    extern void showCleoPicture(int, int, GLuint);
-	    extern void showEmmanuelPic(int, int, GLuint);
-	    extern void showAnthonyPicture(int, int, GLuint);
+    if (gl.background) {
+        glClearColor(0.1, 0.1, 0.1, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT);
+        extern void showBackground(int x , int y, GLuint);
+        showBackground(400, 400, gl.backgroundTexture);
+        return;
+    }
 
-	    //Function Calls:
-	    showAnthonyName(100, gl.yres-100);
-	    showMohammedName(100, gl.yres-200);
-	    showCleoName(100, gl.yres-300);
-	    showMasonName(100, gl.yres-400);
-	    showEmmanuelName(100, gl.yres-500);
+    glClear(GL_COLOR_BUFFER_BIT);
+    float cx = gl.xres/2.0;
+    float cy = gl.yres/2.0;
+    //
+    //show ground
+    glBegin(GL_QUADS);
+    glColor3f(0.2, 0.2, 0.2);
+    glVertex2i(0,       220);
+    glVertex2i(gl.xres, 220);
+    glColor3f(0.4, 0.4, 0.4);
+    glVertex2i(gl.xres,   0);
+    glVertex2i(0,         0);
+    glEnd();
 
-	    showMohammedPicture(300, 400, gl.tigerTexture);
-	    showCleoPicture(300, 300, gl.kfcTexture);
-	    showMasonPicture(300, 200, gl.subaruTexture);
-	    showEmmanuelPic(300, 100, gl.dogTexture);
-	    showAnthonyPicture(300, 500, gl.anthonyTexture);
-	    return;
-	}
+    //show boxes as background
+    for (int i=0; i<20; i++) {
+        glPushMatrix();
+        glTranslated(gl.box[i][0],gl.box[i][1],gl.box[i][2]);
+        glColor3f(0.2, 0.2, 0.2);
+        glBegin(GL_QUADS);
+        glVertex2i( 0,  0);
+        glVertex2i( 0, 30);
+        glVertex2i(20, 30);
+        glVertex2i(20,  0);
+        glEnd();
+        glPopMatrix();
+    } 
 
-	if (gl.background) {
-	    glClearColor(0.1, 0.1, 0.1, 1.0);
-	    glClear(GL_COLOR_BUFFER_BIT);
-	    extern void showBackground(int x , int y, GLuint);
-	    showBackground(400, 400, gl.backgroundTexture);
-	    return;
-	}
-
-	glClear(GL_COLOR_BUFFER_BIT);
-	float cx = gl.xres/2.0;
-	float cy = gl.yres/2.0;
-	//
-	//show ground
-	glBegin(GL_QUADS);
-	glColor3f(0.2, 0.2, 0.2);
-	glVertex2i(0,       220);
-	glVertex2i(gl.xres, 220);
-	glColor3f(0.4, 0.4, 0.4);
-	glVertex2i(gl.xres,   0);
-	glVertex2i(0,         0);
-	glEnd();
-
-	//show boxes as background
-	for (int i=0; i<20; i++) {
-	    glPushMatrix();
-	    glTranslated(gl.box[i][0],gl.box[i][1],gl.box[i][2]);
-	    glColor3f(0.2, 0.2, 0.2);
-	    glBegin(GL_QUADS);
-	    glVertex2i( 0,  0);
-	    glVertex2i( 0, 30);
-	    glVertex2i(20, 30);
-	    glVertex2i(20,  0);
-	    glEnd();
-	    glPopMatrix();
-	} 
-
-	//========================
-	//Render the tile system
-	//========================
-	int tx = lev.tilesize[0];
-	int ty = lev.tilesize[1];
-	Flt dd = lev.ftsz[0];
-	Flt offy = lev.tile_base;
-	int ncols_to_render = gl.xres / lev.tilesize[0] + 2;
-	int col = (int)(gl.camera[0] / dd);
-	col = col % lev.ncols;
-	//Partial tile offset must be determined here.
-	//The leftmost tile might be partially off-screen.
-	//cdd: camera position in terms of tiles.
-	Flt cdd = gl.camera[0] / dd;
-	//flo: just the integer portion
-	Flt flo = floor(cdd);
-	//dec: just the decimal portion
-	Flt dec = (cdd - flo);
-	//offx: the offset to the left of the screen to start drawing tiles
-	Flt offx = -dec * dd;
-	//Log("gl.camera[0]: %lf   offx: %lf\n",gl.camera[0],offx);
-	for (int j=0; j<ncols_to_render; j++) {
-	    int row = lev.nrows-1;
-	    for (int i=0; i<lev.nrows; i++) {
-		if (lev.arr[row][col] == 'w') {
-		    glColor3f(0.8, 0.8, 0.6);
-		    glPushMatrix();
-		    //put tile in its place
-		    glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
-		    glBegin(GL_QUADS);
-		    glVertex2i( 0,  0);
-		    glVertex2i( 0, ty);
-		    glVertex2i(tx, ty);
-		    glVertex2i(tx,  0);
-		    glEnd();
-		    glPopMatrix();
-		}
-		if (lev.arr[row][col] == 'b') {
-		    glColor3f(0.9, 0.2, 0.2);
-		    glPushMatrix();
-		    glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
-		    glBegin(GL_QUADS);
-		    glVertex2i( 0,  0);
-		    glVertex2i( 0, ty);
-		    glVertex2i(tx, ty);
-		    glVertex2i(tx,  0);
-		    glEnd();
-		    glPopMatrix();
-		}
-		if (lev.arr[row][col] == 'r') {
-		    glColor3f(75, 0, 130);
-		    glPushMatrix();
-		    glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
-		    glBegin(GL_QUADS);
-		    glVertex2i( 0,  0);
-		    glVertex2i( 0, ty);
-		    glVertex2i(tx, ty);
-		    glVertex2i(tx,  0);
-		    glEnd();
-		    glPopMatrix();
-		}
-		--row;
-	    }
-	    col = (col+1) % lev.ncols;
-	} 
-	glColor3f(1.0, 1.0, 0.1);
-	glPushMatrix();
-	//put ball in its place
-	glTranslated(gl.ball_pos[0], lev.tile_base+gl.ball_pos[1], 0);
-	glBegin(GL_QUADS);
-	glVertex2i(-10, 0);
-	glVertex2i(-10, 20);
-	glVertex2i( 10, 20);
-	glVertex2i( 10, 0);
-	glEnd();
-	glPopMatrix();
-	//--------------------------------------
+    //========================
+    //Render the tile system
+    //========================
+    int tx = lev.tilesize[0];
+    int ty = lev.tilesize[1];
+    Flt dd = lev.ftsz[0];
+    Flt offy = lev.tile_base;
+    int ncols_to_render = gl.xres / lev.tilesize[0] + 2;
+    int col = (int)(gl.camera[0] / dd);
+    col = col % lev.ncols;
+    //Partial tile offset must be determined here.
+    //The leftmost tile might be partially off-screen.
+    //cdd: camera position in terms of tiles.
+    Flt cdd = gl.camera[0] / dd;
+    //flo: just the integer portion
+    Flt flo = floor(cdd);
+    //dec: just the decimal portion
+    Flt dec = (cdd - flo);
+    //offx: the offset to the left of the screen to start drawing tiles
+    Flt offx = -dec * dd;
+    //Log("gl.camera[0]: %lf   offx: %lf\n",gl.camera[0],offx);
+    for (int j=0; j<ncols_to_render; j++) {
+        int row = lev.nrows-1;
+        for (int i=0; i<lev.nrows; i++) {
+            if (lev.arr[row][col] == 'w') {
+                glColor3f(0.8, 0.8, 0.6);
+                glPushMatrix();
+                //put tile in its place
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'b') {
+                glColor3f(0.9, 0.2, 0.2);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'r') {
+                glColor3f(75, 0, 130);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            --row;
+        }
+        col = (col+1) % lev.ncols;
+    } 
+    glColor3f(1.0, 1.0, 0.1);
+    glPushMatrix();
+    //put ball in its place
+    glTranslated(gl.ball_pos[0], lev.tile_base+gl.ball_pos[1], 0);
+    glBegin(GL_QUADS);
+    glVertex2i(-10, 0);
+    glVertex2i(-10, 20);
+    glVertex2i( 10, 20);
+    glVertex2i( 10, 0);
+    glEnd();
+    glPopMatrix();
+    //--------------------------------------
 #ifdef SHOW_FAKE_SHADOW
-	glColor3f(0.25, 0.25, 0.25);
-	glBegin(GL_QUADS);
-	glVertex2i(cx-60, 150);
-	glVertex2i(cx+50, 150);
-	glVertex2i(cx+50, 130);
-	glVertex2i(cx-60, 130);
-	glEnd();
+    glColor3f(0.25, 0.25, 0.25);
+    glBegin(GL_QUADS);
+    glVertex2i(cx-60, 150);
+    glVertex2i(cx+50, 150);
+    glVertex2i(cx+50, 130);
+    glVertex2i(cx-60, 130);
+    glEnd();
 #endif
-	//--------------------------------------
-	float h = 200.0;
-	float w = h * 0.5;
-	glPushMatrix();
-	glColor3f(1.0, 1.0, 1.0);
-	glBindTexture(GL_TEXTURE_2D, gl.walkTexture);
-	//
-	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_GREATER, 0.0f);
-	glColor4ub(255,255,255,255);
-	int ix = gl.walkFrame % 7;
-	int iy = 0;
-	if (gl.walkFrame >= 7)
-	    iy = 1;
-	float fx = (float)ix / 7.0;
-	float fy = (float)iy / 2.0;
-	glBegin(GL_QUADS);
-	if (gl.keys[XK_Left]) {
-	    glTexCoord2f(fx+.125, fy+.5); glVertex2i(cx-w, cy-h);
-	    glTexCoord2f(fx+.125, fy);    glVertex2i(cx-w, cy+h);
-	    glTexCoord2f(fx,      fy);    glVertex2i(cx+w, cy+h);
-	    glTexCoord2f(fx,      fy+.5); glVertex2i(cx+w, cy-h);
-	} else {
-	    glTexCoord2f(fx,      fy+.5); glVertex2i(cx-w, cy-h);
-	    glTexCoord2f(fx,      fy);    glVertex2i(cx-w, cy+h);
-	    glTexCoord2f(fx+.125, fy);    glVertex2i(cx+w, cy+h);
-	    glTexCoord2f(fx+.125, fy+.5); glVertex2i(cx+w, cy-h);
-	}
-	glEnd();
-	glPopMatrix();
-
-	//Show Health
-	extern void showHealth(int, int, int, GLuint);
-	showHealth(100, 500, gl.playerHealth, gl.healthTexture);
-
-	//Show Healthbar UI	
-	extern void showHealthbar(int, int, GLuint);
-	showHealthbar(100 ,500 ,gl.healthbarTexture);
-
-	//For Text Color
-	extern int colorFont(std::string);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glDisable(GL_ALPHA_TEST);
-
-	//Health Bar Text
-	extern void showText(int, int, int, const char*);	
-	showText(50, gl.yres-166, colorFont("white"), "Health");
-
-	//UI Help UI_Display
-	extern void arrowKeysPicture(int, int, GLuint);
-	extern void Controls_UI(int, int);
-	Controls_UI(620,515);
-	//arrowKeysPicture(500, 500, gl.keysTexture);
-
-	/*	unsigned int c = 0x00ffff44;
-		r.bot = gl.yres - 20;
-		r.left = 10;
-		r.center = 0;
-		ggprint8b(&r, 16, c, "W   Walk cycle");
-		ggprint8b(&r, 16, c, "E   Explosion");
-		ggprint8b(&r, 16, c, "+   faster");
-		ggprint8b(&r, 16, c, "-   slower");
-		ggprint8b(&r, 16, c, "right arrow -> walk right");
-		ggprint8b(&r, 16, c, "left arrow  <- walk left");
-		ggprint8b(&r, 16, c, "frame: %i", gl.walkFrame); */
-	if (gl.movie) {
-	    screenCapture();
-	} 
+    //--------------------------------------
+    float h = 200.0;
+    float w = h * 0.5;
+    glPushMatrix();
+    glColor3f(1.0, 1.0, 1.0);
+    glBindTexture(GL_TEXTURE_2D, gl.walkTexture);
+    //
+    glEnable(GL_ALPHA_TEST);
+    glAlphaFunc(GL_GREATER, 0.0f);
+    glColor4ub(255,255,255,255);
+    int ix = gl.walkFrame % 7;
+    int iy = 0;
+    if (gl.walkFrame >= 7)
+        iy = 1;
+    float fx = (float)ix / 7.0;
+    float fy = (float)iy / 2.0;
+    glBegin(GL_QUADS);
+    if (gl.keys[XK_Left]) {
+        glTexCoord2f(fx+.125, fy+.5); glVertex2i(cx-w, cy-h);
+        glTexCoord2f(fx+.125, fy);    glVertex2i(cx-w, cy+h);
+        glTexCoord2f(fx,      fy);    glVertex2i(cx+w, cy+h);
+        glTexCoord2f(fx,      fy+.5); glVertex2i(cx+w, cy-h);
+    } else {
+        glTexCoord2f(fx,      fy+.5); glVertex2i(cx-w, cy-h);
+        glTexCoord2f(fx,      fy);    glVertex2i(cx-w, cy+h);
+        glTexCoord2f(fx+.125, fy);    glVertex2i(cx+w, cy+h);
+        glTexCoord2f(fx+.125, fy+.5); glVertex2i(cx+w, cy-h);
     }
+    glEnd();
+    glPopMatrix();
+
+    //Show Health
+    extern void showHealth(int, int, int, GLuint);
+    showHealth(100, 500, gl.playerHealth, gl.healthTexture);
+
+    //Show Healthbar UI	
+    extern void showHealthbar(int, int, GLuint);
+    showHealthbar(100 ,500 ,gl.healthbarTexture);
+
+    //For Text Color
+    extern int colorFont(std::string);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_ALPHA_TEST);
+
+    //Health Bar Text
+    extern void showText(int, int, int, const char*);	
+    showText(50, gl.yres-166, colorFont("white"), "Health");
+
+    //UI Help UI_Display
+    extern void arrowKeysPicture(int, int, GLuint);
+    extern void Controls_UI(int, int);
+    Controls_UI(620,515);
+    //arrowKeysPicture(500, 500, gl.keysTexture);
+
+    /*	unsigned int c = 0x00ffff44;
+        r.bot = gl.yres - 20;
+        r.left = 10;
+        r.center = 0;
+        ggprint8b(&r, 16, c, "W   Walk cycle");
+        ggprint8b(&r, 16, c, "E   Explosion");
+        ggprint8b(&r, 16, c, "+   faster");
+        ggprint8b(&r, 16, c, "-   slower");
+        ggprint8b(&r, 16, c, "right arrow -> walk right");
+        ggprint8b(&r, 16, c, "left arrow  <- walk left");
+        ggprint8b(&r, 16, c, "frame: %i", gl.walkFrame); */
+    if (gl.movie) {
+        screenCapture();
+    } 
+}

@@ -34,7 +34,7 @@ public:
 	double timeDiff(struct timespec *start, struct timespec *end);
 	void timeCopy(struct timespec *dest, struct timespec *source);
 	void recordTime(struct timespec *t);
-} timers;
+};
 //-----------------------------------------------------------------------------
 
 
@@ -92,7 +92,7 @@ public:
 
 	~Global();
 	Global();
-} gl;
+};
 
 class Level {
 public:
@@ -104,7 +104,7 @@ public:
 
     	Level();
 	void removeCrLf(char *str);
-} lev;
+};
 
 //X Windows variables
 class X11_wrapper {
@@ -121,7 +121,7 @@ public:
 	bool getXPending();
 	XEvent getXNextEvent();
 	void swapBuffers();
-} x11;
+};
 
 class Image {
 public:
@@ -130,24 +130,5 @@ public:
 	
     ~Image();
 	Image(const char *fname);
-};
-
-Image img[11] = {
-"./images/walk.gif",
-"./images/exp.png",
-"./images/exp44.png",
-"./images/tiger.jpg",
-"./images/subaru.jpg",
-"./images/dog.jpg",
-"./images/KFC.png", 
-"./images/anthony.jpg",
-"./images/objects/HealthBarUI.png",
-"./images/objects/health.png",
-"./images/objects/arrowKeys.png"
-};
-
-Image backgroundImg[2] = { 
-"./images/background/clam-parking.jpg", 
-"./images/background/clam-noparking.gif" 
 };
 #endif
