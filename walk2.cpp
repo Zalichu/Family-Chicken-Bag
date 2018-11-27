@@ -28,22 +28,22 @@ Level lev;
 X11_wrapper x11;
 
 Image img[11] = {
-"./images/walk.gif",
-"./images/exp.png",
-"./images/exp44.png",
-"./images/tiger.jpg",
-"./images/subaru.jpg",
-"./images/dog.jpg",
-"./images/KFC.png",
-"./images/anthony.jpg",
-"./images/objects/HealthBarUI.png",
-"./images/objects/health.png",
-"./images/objects/arrowKeys.png"
+    "./images/walk.gif",
+    "./images/exp.png",
+    "./images/exp44.png",
+    "./images/tiger.jpg",
+    "./images/subaru.jpg",
+    "./images/dog.jpg",
+    "./images/KFC.png",
+    "./images/anthony.jpg",
+    "./images/objects/HealthBarUI.png",
+    "./images/objects/health.png",
+    "./images/objects/arrowKeys.png"
 };
 
 Image backgroundImg[2] = {
-"./images/background/clam-parking.jpg",
-"./images/background/clam-noparking.gif"
+    "./images/background/clam-parking.jpg",
+    "./images/background/clam-noparking.gif"
 };
 
 typedef double Flt;
@@ -61,6 +61,7 @@ typedef Flt	Matrix[4][4];
 (c)[2]=(a)[2]-(b)[2]
 const float timeslice = 1.0f;
 const float gravity = -0.2f;
+int countp = 0;
 #define ALPHA 1
 
 void initOpengl();
@@ -689,7 +690,12 @@ int checkKeys(XEvent *e)
             gl.credits ^= 1; 
             break;
         case XK_r:
-            gl.punch ^= 1;
+            if (countp < 14) {
+                gl.punch ^= 1;
+                countp++;
+            }
+            else
+                countp = 0;
             break;
             //Menu
         case XK_p:
@@ -772,37 +778,15 @@ void physics(void)
             }
         }
     }
-    if (gl.punch){
-        extern void showPunch();
-        showPunch();
-        /*
-        //man is walking...
-        //when time is up, advance the frame.
-        timers.recordTime(&timers.timeCurrent);
-        double timeSpan = timers.timeDiff(&timers.walkTime, &timers.timeCurrent);
-        if (timeSpan > gl.delay) {
-            //advance
-            ++gl.walkFrame;
-            if (gl.walkFrame >= 14)
-                gl.walkFrame -= 14;
-            timers.recordTime(&timers.walkTime);
+        if (gl.punch){
+            extern void showPunch();
+            showPunch();
+            countp++;
+            if (countp >= 75) {
+                gl.punch ^= 1;
+                countp = 0;
+            }
         }
-        for (int i=0; i<20; i++) {
-            gl.box[i][0] -= 1.0 * (0.05 / gl.delay);
-            if (gl.box[i][0] < -10.0)
-                gl.box[i][0] += gl.xres + 10.0;
-            gl.camera[0] += 2.0/lev.tilesize[0] * (0.05 / gl.delay);
-            if (gl.camera[0] < 0.0)
-                gl.camera[0] = 0.0;
-        }
-        if (gl.exp.onoff) {
-            gl.exp.pos[0] -= 2.0 * (0.05 / gl.delay);
-        }
-        if (gl.exp44.onoff) {
-            gl.exp44.pos[0] -= 2.0 * (0.05 / gl.delay);
-        }
-        */
-    }
     if (gl.exp.onoff) {
         //explosion is happening
         timers.recordTime(&timers.timeCurrent);
