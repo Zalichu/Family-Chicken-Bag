@@ -20,7 +20,7 @@
 #include <string>
 #include <iostream>
 #include "anthonyR.h"
-#include "emmanuelC.h"
+#include "global.h"
 
 typedef double Flt;
 typedef double Vec[3];
@@ -761,11 +761,6 @@ void physics(void)
 	    timers.recordTime(&timers.walkTime);
 	}
 	for (int i=0; i<20; i++) {
-	    if (gl.walkFrame >= 13)
-		gl.walkFrame -= 13;
-	    timers.recordTime(&timers.walkTime);
-	}
-	for (int i=7; i<20; i++) {
 	    /*if (gl.keys[XK_Left]) {
 	      gl.box[i][0] += 1.0 * (0.05 / gl.delay);
 	      if (gl.box[i][0] > gl.xres + 10.0)
