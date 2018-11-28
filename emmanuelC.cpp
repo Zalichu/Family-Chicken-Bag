@@ -38,7 +38,7 @@ void showEmmanuelPic(int x, int y, GLuint texid)
 	glPopMatrix();
 
 }
-void showPunch()
+int showPunch(int frame)
 {
 	//man is walking...
 	//when time is up, advance the frame.
@@ -47,6 +47,7 @@ void showPunch()
 	if (timeSpan > gl.delay) {
 		//advance
 		++gl.walkFrame;
+		frame++;
 		if (gl.walkFrame >= 14)
 			gl.walkFrame -= 14;
 		timers.recordTime(&timers.walkTime);
@@ -65,4 +66,5 @@ void showPunch()
 	if (gl.exp44.onoff) {
 		gl.exp44.pos[0] -= 2.0 * (0.05 / gl.delay);
 	}
+	return frame;
 }
