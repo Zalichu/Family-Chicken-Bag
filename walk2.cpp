@@ -70,6 +70,10 @@ void init();
 void physics();
 void render();
 
+// TESTING
+int locationX;
+Collision A;
+
 /*	SETUP TIMERS
     -----------------------------------------------------------------------------*/
 Timers::Timers() {
@@ -1002,6 +1006,11 @@ void render(void)
                 glPopMatrix();
             }
             if (lev.arr[row][col] == 'r') {
+				locationX = (Flt)j*dd+offx;
+				A.Within_Range(locationX);
+				
+				std::cout << locationX << std::endl;
+
                 glColor3f(75, 0, 130);
                 glPushMatrix();
                 glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
@@ -1091,6 +1100,10 @@ void render(void)
     extern void arrowKeysPicture(int, int, GLuint);
     extern void Controls_UI(int, int);
     Controls_UI(620,515);
+
+	//DEBUG for Collision
+	extern void DEBUG(int, int);
+	DEBUG(100,100);
     //arrowKeysPicture(500, 500, gl.keysTexture);
 
     /*	unsigned int c = 0x00ffff44;

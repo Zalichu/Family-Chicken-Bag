@@ -10,6 +10,10 @@
 #include "fonts.h"
 #include <GL/glx.h>
 #include "anthonyR.h"
+#include "global.h"
+#include <string>
+
+extern Collision A;
 
 using namespace std;
 
@@ -181,6 +185,50 @@ void Controls_UI(int x, int y) //WIP
 	showText(x-52, y-48, colorFont("yellow"), "Space | Jump");
 }
 
+void DEBUG(int x, int y) //WIP 
+{	
+	int boxSize = 70;
+	int borderSize = 5;
+	
+	//Red Border
+ 	glColor3ub(204, 0, 0);
+    int wid = boxSize + borderSize;
+	int height = boxSize + borderSize;
+    glPushMatrix();
+    glTranslatef(x, y, 0);
+    glBegin(GL_QUADS);
+    	glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -height);
+    	glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, height);
+    	glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, height);
+    	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -height);
+    glEnd();
+    glPopMatrix();
+	//Light Grey Box 
+ 	glColor3ub(160, 160, 160);
+    wid -= borderSize;
+	height -= borderSize;
+    glPushMatrix();
+    glTranslatef(x, y, 0);
+    glBegin(GL_QUADS);
+    	glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -height);
+    	glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, height);
+    	glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, height);
+    	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -height);
+    glEnd();
+    glPopMatrix();
+	showText(x-52, y+5, colorFont("red"), "DEBUGGING");	
+	showText(x-52, y, colorFont("red"), "==========");
+	string sRange;
+	if (A.Within_Range(A.range))
+		sRange = "true";
+	else
+		sRange = "false";
+	showText(x-52, y-65, colorFont("yellow"), "range: ");
+	//showText(int x, int y, int colorText, const char* text)
+	showText(x-52, y-13, colorFont("yellow"), "punching: ");
+	showText(x-52, y-33, colorFont("yellow"), "damage done: ");
+	showText(x-52, y-49, colorFont("yellow"), "hit detected: ");
+}
 /* MISC. FUNCTIONS
 --------------------------------------------------------------*/
 int colorFont(string colorChoice)
