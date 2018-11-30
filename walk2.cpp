@@ -785,10 +785,9 @@ void physics(void)
         }
     }
         if (gl.punch){
-            extern void showPunch();
-            showPunch();
-            countp++;
-            if (countp >= 75) {
+            extern int showPunch(int);
+            countp = showPunch(countp);
+            if (countp >= 14) {
                 gl.punch ^= 1;
                 countp = 0;
             }
