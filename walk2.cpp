@@ -1021,6 +1021,8 @@ void render(void)
                 	glVertex2i(tx,  0);
                 glEnd();
                 glPopMatrix();
+				if (enemy1.health < 0) 
+					enemy1.health = 0;
 				enemyHealth(locationX, 170, enemy1.health, 14, enemy1);
     			showText(locationX, 80, colorFont("red"), " Enemy Health");
             }
