@@ -27,7 +27,7 @@ Global gl;
 Level lev;
 X11_wrapper x11;
 
-Image img[11] = {
+Image img[12] = {
     "./images/walk.gif",
     "./images/exp.png",
     "./images/exp44.png",
@@ -38,7 +38,8 @@ Image img[11] = {
     "./images/anthony.jpg",
     "./images/objects/HealthBarUI.png",
     "./images/objects/health.png",
-    "./images/objects/arrowKeys.png"
+    "./images/objects/arrowKeys.png",
+    "./images/FCBTitle.png"	    
 };
 
 Image backgroundImg[2] = {
@@ -113,6 +114,7 @@ Global::~Global() {
 Global::Global() {
     playerHealth = 80;
     menu = false;
+    Title = true;
     credits = false;
     background = false;
     logOpen();
@@ -457,6 +459,16 @@ void initOpengl(void)
     glTexImage2D(GL_TEXTURE_2D,0,3,keyimageW,keyimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[10].data);
     glViewport(0, 0, gl.xres, gl.yres);
 
+    //Title Screen
+    glGenTextures(1, &gl.titleTexture);
+    int TimageW = img[11].width; 
+    int TimageH = img[11].height; 
+    glBindTexture(GL_TEXTURE_2D, gl.titleTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D,0,3,TimageW,TimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[11].data);
+    glViewport(0, 0, gl.xres, gl.yres);
+
     //Initialize matrices
     glMatrixMode(GL_PROJECTION); glLoadIdentity();
     glMatrixMode(GL_MODELVIEW); glLoadIdentity();
@@ -725,6 +737,9 @@ int checkKeys(XEvent *e)
         case XK_minus:
             gl.delay += 0.005;
             break;
+	case XK_space:
+	    gl.Title ^= 1;
+	    break;
         case XK_Escape:
             return 1;
             break;
@@ -846,10 +861,21 @@ void physics(void)
     gl.ball_pos[1] += gl.ball_vel[1];
 
 }
+
 extern int colorFont(std::string);
-extern void showText(int, int, int, const char*);	
+extern void showText(int, int, int, const char*);
+
 void render(void)
 {
+    if (gl.Title) {
+	std::cout << gl.Title << std::endl;
+	glClearColor(0.1, 0.1, 0.1, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+	extern void showTitlePic(int x, int y, GLuint txt);
+        showTitlePic(200,200,gl.titleTexture);	
+	return;
+    }
+
     //Clear the screen
     glClearColor(0.1, 0.1, 0.1, 1.0);
 
