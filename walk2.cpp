@@ -75,7 +75,6 @@ void render();
 int locationX;
 Collision A;
 Enemy enemy1;
-
 /*	SETUP TIMERS
     -----------------------------------------------------------------------------*/
 Timers::Timers() {
@@ -1006,7 +1005,6 @@ void render(void)
             }
 
 			extern void enemyHealth(int x, int y, int w, int h, Enemy &enemy1);
-			enemy1.health = 100;
             if (lev.arr[row][col] == 'c') {
 				locationX = (Flt)j*dd+offx;
 				A.Within_Range(locationX);
@@ -1115,6 +1113,7 @@ void render(void)
 		{
 			std::cout << " - Dmg: " << A.Damage();
 			enemy1.health -= A.Damage();
+			std::cout << " - ENEMY HEALTH: " << enemy1.health;
 			A.restrict = false;
 		}
 	}

@@ -49,7 +49,7 @@ public:
 class Enemy {
 public:
 	int health;
-	Enemy() { health = 10; }
+	Enemy() { health = 100; }
 };
 #endif
 
