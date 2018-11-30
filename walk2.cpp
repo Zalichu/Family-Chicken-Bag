@@ -28,22 +28,22 @@ Level lev;
 X11_wrapper x11;
 
 Image img[11] = {
-"./images/walk.gif",
-"./images/exp.png",
-"./images/exp44.png",
-"./images/tiger.jpg",
-"./images/subaru.jpg",
-"./images/dog.jpg",
-"./images/KFC.png",
-"./images/anthony.jpg",
-"./images/objects/HealthBarUI.png",
-"./images/objects/health.png",
-"./images/objects/arrowKeys.png"
+    "./images/walk.gif",
+    "./images/exp.png",
+    "./images/exp44.png",
+    "./images/tiger.jpg",
+    "./images/subaru.jpg",
+    "./images/dog.jpg",
+    "./images/KFC.png",
+    "./images/anthony.jpg",
+    "./images/objects/HealthBarUI.png",
+    "./images/objects/health.png",
+    "./images/objects/arrowKeys.png"
 };
 
 Image backgroundImg[2] = {
-"./images/background/clam-parking.jpg",
-"./images/background/clam-noparking.gif"
+    "./images/background/clam-parking.jpg",
+    "./images/background/clam-noparking.gif"
 };
 
 typedef double Flt;
@@ -61,6 +61,7 @@ typedef Flt	Matrix[4][4];
 (c)[2]=(a)[2]-(b)[2]
 const float timeslice = 1.0f;
 const float gravity = -0.2f;
+int countp = 0;
 #define ALPHA 1
 
 void initOpengl();
@@ -73,6 +74,7 @@ void render();
 // TESTING
 int locationX;
 Collision A;
+Enemy enemy1;
 
 /*	SETUP TIMERS
     -----------------------------------------------------------------------------*/
@@ -693,7 +695,13 @@ int checkKeys(XEvent *e)
             gl.credits ^= 1; 
             break;
         case XK_r:
-            gl.punch ^= 1;
+            if (countp < 14) {
+				A.restrict = true;
+                gl.punch ^= 1;
+                countp++;
+            }
+            else
+                countp = 0;
             break;
             //Menu
         case XK_p:
@@ -776,37 +784,15 @@ void physics(void)
             }
         }
     }
-    if (gl.punch){
-        extern void showPunch();
-        showPunch();
-        /*
-        //man is walking...
-        //when time is up, advance the frame.
-        timers.recordTime(&timers.timeCurrent);
-        double timeSpan = timers.timeDiff(&timers.walkTime, &timers.timeCurrent);
-        if (timeSpan > gl.delay) {
-            //advance
-            ++gl.walkFrame;
-            if (gl.walkFrame >= 14)
-                gl.walkFrame -= 14;
-            timers.recordTime(&timers.walkTime);
+        if (gl.punch){
+            extern void showPunch();
+            showPunch();
+            countp++;
+            if (countp >= 75) {
+                gl.punch ^= 1;
+                countp = 0;
+            }
         }
-        for (int i=0; i<20; i++) {
-            gl.box[i][0] -= 1.0 * (0.05 / gl.delay);
-            if (gl.box[i][0] < -10.0)
-                gl.box[i][0] += gl.xres + 10.0;
-            gl.camera[0] += 2.0/lev.tilesize[0] * (0.05 / gl.delay);
-            if (gl.camera[0] < 0.0)
-                gl.camera[0] = 0.0;
-        }
-        if (gl.exp.onoff) {
-            gl.exp.pos[0] -= 2.0 * (0.05 / gl.delay);
-        }
-        if (gl.exp44.onoff) {
-            gl.exp44.pos[0] -= 2.0 * (0.05 / gl.delay);
-        }
-        */
-    }
     if (gl.exp.onoff) {
         //explosion is happening
         timers.recordTime(&timers.timeCurrent);
@@ -862,6 +848,8 @@ void physics(void)
     gl.ball_pos[1] += gl.ball_vel[1];
 
 }
+extern int colorFont(std::string);
+extern void showText(int, int, int, const char*);	
 void render(void)
 {
     //Clear the screen
@@ -1005,12 +993,7 @@ void render(void)
                 glEnd();
                 glPopMatrix();
             }
-            if (lev.arr[row][col] == 'r') {
-				locationX = (Flt)j*dd+offx;
-				A.Within_Range(locationX);
-				
-				std::cout << locationX << std::endl;
-
+            if (lev.arr[row][col] == 'r') {	
                 glColor3f(75, 0, 130);
                 glPushMatrix();
                 glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
@@ -1021,6 +1004,28 @@ void render(void)
                 glVertex2i(tx,  0);
                 glEnd();
                 glPopMatrix();
+            }
+
+			extern void enemyHealth(int x, int y, int w, int h, Enemy &enemy1);
+			enemy1.health = 100;
+            if (lev.arr[row][col] == 'c') {
+				locationX = (Flt)j*dd+offx;
+				A.Within_Range(locationX);
+				
+				std::cout << locationX;
+
+                glColor3f(75, 0, 130);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                	glVertex2i( 0,  0);
+                	glVertex2i( 0, ty);
+                	glVertex2i(tx, ty);
+                	glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+				enemyHealth(locationX, 170, enemy1.health, 14, enemy1);
+    			showText(locationX, 80, colorFont("red"), " Enemy Health");
             }
             --row;
         }
@@ -1087,13 +1092,11 @@ void render(void)
     showHealthbar(100 ,500 ,gl.healthbarTexture);
 
     //For Text Color
-    extern int colorFont(std::string);
 
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_ALPHA_TEST);
 
     //Health Bar Text
-    extern void showText(int, int, int, const char*);	
     showText(50, gl.yres-166, colorFont("white"), "Health");
 
     //UI Help UI_Display
@@ -1105,7 +1108,18 @@ void render(void)
 	extern void DEBUG(int, int);
 	DEBUG(100,100);
     //arrowKeysPicture(500, 500, gl.keysTexture);
-
+	
+	//Collision
+	if (A.Within_Range(locationX)) {
+		std::cout << " - in range ";
+		if (A.Punching(gl.punch) == true)
+		{
+			std::cout << " - Dmg: " << A.Damage();
+			enemy1.health -= A.Damage();
+			A.restrict = false;
+		}
+	}
+	std::cout << std::endl;
     /*	unsigned int c = 0x00ffff44;
         r.bot = gl.yres - 20;
         r.left = 10;

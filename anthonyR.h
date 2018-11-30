@@ -8,6 +8,7 @@ public:
 	bool contact;
 	bool punching;
 	bool range;
+	bool restrict;
 
 	enum moveSet {
 		Punch = 0	
@@ -17,11 +18,11 @@ public:
 		contact = false;	
 		punching = false;
 		range = 1000;
+		restrict = false;
 	}
 	bool Within_Range(int range) {
-		if (range > 600 && range < 700) {
+		if (range > 400 && range < 600) {
 			this->range = range;
-			std::cout << " IN RANGE";
 			return true;
 		}
 		return false;
@@ -31,9 +32,11 @@ public:
 		return flag;
 	}
 	int Damage() {
-		if (punching == true)
+		if (restrict == true)	
 			return 20;
-		return 0;		
+		if (punching == true)
+			return 0;
+		return 20;		
 	}
 	void Check_For_Hit() {
 		if (punching) {
@@ -43,5 +46,10 @@ public:
 	}
 };
 
+class Enemy {
+public:
+	int health;
+	Enemy() { health = 10; }
+};
 #endif
 

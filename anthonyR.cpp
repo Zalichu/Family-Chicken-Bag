@@ -118,6 +118,21 @@ void showHealth(int x, int y, int playerHealth, GLuint texid)
     glPopMatrix();
 }
 
+void enemyHealth(int x, int y, int wid, int height, Enemy &enemy1)
+{
+	wid = enemy1.health;
+	glColor3ub(75,0.2,130);
+	glPushMatrix();
+	glTranslatef(x,y,0);
+	glBegin(GL_QUADS);	
+        glVertex2i(-wid, -height);
+    	glVertex2i(-wid, height);
+    	glVertex2i(wid, height);
+    	glVertex2i(wid, -height);
+	glEnd();
+	glPopMatrix();
+}
+
 void pauseScreen(int x, int y)
 {
 	Rect menu;
@@ -218,11 +233,6 @@ void DEBUG(int x, int y) //WIP
     glPopMatrix();
 	showText(x-52, y+5, colorFont("red"), "DEBUGGING");	
 	showText(x-52, y, colorFont("red"), "==========");
-	string sRange;
-	if (A.Within_Range(A.range))
-		sRange = "true";
-	else
-		sRange = "false";
 	showText(x-52, y-65, colorFont("yellow"), "range: ");
 	//showText(int x, int y, int colorText, const char* text)
 	showText(x-52, y-13, colorFont("yellow"), "punching: ");
