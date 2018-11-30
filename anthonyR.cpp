@@ -10,7 +10,7 @@
 #include "fonts.h"
 #include <GL/glx.h>
 #include "anthonyR.h"
-#include "global.h"
+#include "emmanuelC.h"
 #include <string>
 
 extern Collision A;

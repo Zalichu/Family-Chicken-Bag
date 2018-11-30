@@ -5,7 +5,7 @@
 
 #include "fonts.h"
 #include <GL/glx.h>
-#include "global.h"
+#include "emmanuelC.h"
 
 extern Timers timers;
 extern Global gl;
