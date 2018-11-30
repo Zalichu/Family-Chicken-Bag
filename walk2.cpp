@@ -21,6 +21,7 @@
 #include <iostream>
 #include "anthonyR.h"
 #include "emmanuelC.h"
+using namespace std; 
 
 Timers timers;
 Global gl;
@@ -973,11 +974,12 @@ void render(void)
                 glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
                 glBegin(GL_QUADS);
                 glVertex2i( 0,  0);
-                glVertex2i( 0, ty);
+                glVertex2i( 0, ty);	
                 glVertex2i(tx, ty);
                 glVertex2i(tx,  0);
                 glEnd();
                 glPopMatrix();
+		//cout << "\nbrown tile pos-> x: " << j*dd+offx << " y: " << i*lev.ftsz[1]+offy << endl;
             }
             if (lev.arr[row][col] == 'b') {
                 glColor3f(0.9, 0.2, 0.2);
@@ -990,6 +992,7 @@ void render(void)
                 glVertex2i(tx,  0);
                 glEnd();
                 glPopMatrix();
+		//cout << "\nred tile pos-> x: " << j*dd+offx << " y: " << i*lev.ftsz[1]+offy << endl;
             }
             if (lev.arr[row][col] == 'r') {	
                 glColor3f(75, 0, 130);

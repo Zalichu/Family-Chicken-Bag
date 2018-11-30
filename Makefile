@@ -8,5 +8,5 @@ walk2: walk2.cpp log.cpp anthonyR.cpp
 
 clean:
 	rm -f walk2
-	rm -f *.o
+	rm -f *.o .*.swp
 
