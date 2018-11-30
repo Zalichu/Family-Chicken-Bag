@@ -4,7 +4,33 @@
 #include<iostream>
 #include<GL/glx.h>
 #include "fonts.h"
+#include "global.h"
 using namespace std; 
+// Porpuse: tiles system. 
+
+class Tile {
+public:
+	Tile();
+	void setTile(); 
+	int tx;
+	int ty; 
+	int ncols_to_render;
+	int col; 
+	Flt dd;
+	Flt offx;
+	Flt offy;
+	Flt cdd;
+	Flt flo;
+	Flt dec;	
+private:
+
+};
+
+Tile::Tile() {
+	
+}
+
+
 
 void showMohammedName(int x, int y) { 
     Rect r; 

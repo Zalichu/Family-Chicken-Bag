@@ -20,12 +20,13 @@
 #include <string>
 #include <iostream>
 #include "anthonyR.h"
-#include "global.h"
+#include "emmanuelC.h"
+using namespace std; 
 
-Timers timers;
-Global gl;
-Level lev;
-X11_wrapper x11;
+extern Timers timers;
+extern Global gl;
+extern Level lev;
+extern X11_wrapper x11;
 
 Image img[11] = {
     "./images/walk.gif",
@@ -75,241 +76,6 @@ void render();
 int locationX;
 Collision A;
 Enemy enemy1;
-/*	SETUP TIMERS
-    -----------------------------------------------------------------------------*/
-Timers::Timers() {
-    physicsRate = 1.0 / 30.0;
-    oobillion = 1.0 / 1e9;
-}
-double Timers::timeDiff(struct timespec *start, struct timespec *end) {
-    return (double)(end->tv_sec - start->tv_sec ) +
-        (double)(end->tv_nsec - start->tv_nsec) * oobillion;
-}
-void Timers::timeCopy(struct timespec *dest, struct timespec *source) {
-    memcpy(dest, source, sizeof(struct timespec));
-}
-void Timers::recordTime(struct timespec *t) {
-    clock_gettime(CLOCK_REALTIME, t);
-}
-//-----------------------------------------------------------------------------
-
-
-// Past image class here. if it did not work.
-
-class Image;
-
-
-Sprite::Sprite() {
-    onoff = 0;
-    frame = 0;
-    image = NULL;
-    delay = 0.1;
-}
-
-
-Global::~Global() {
-    logClose();
-}
-Global::Global() {
-    playerHealth = 80;
-    menu = false;
-    credits = false;
-    background = false;
-    logOpen();
-    camera[0] = camera[1] = 0.0;
-    movie=0;
-    movieStep=2;
-    xres=800;
-    yres=600;
-    walk=0;
-    punch=0;
-    walkFrame=0;
-    walkImage=NULL;
-    MakeVector(ball_pos, 520.0, 0, 0);
-    MakeVector(ball_vel, 0, 0, 0);
-    delay = 0.1;
-    exp.onoff=0;
-    exp.frame=0;
-    exp.image=NULL;
-    exp.delay = 0.02;
-    exp44.onoff=0;
-    exp44.frame=0;
-    exp44.image=NULL;
-    exp44.delay = 0.022;
-    for (int i=0; i<20; i++) {
-        box[i][0] = rnd() * xres;
-        box[i][1] = rnd() * (yres-220) + 270; //Image Movement
-        box[i][2] = 0.0;
-    }
-    memset(keys, 0, 65536);
-}
-
-Level::Level() {
-    tilesize[0] = 32;
-    tilesize[1] = 32;
-    ftsz[0] = (Flt)tilesize[0];
-    ftsz[1] = (Flt)tilesize[1];
-    tile_base = 220.0;
-    //read level
-    FILE *fpi = fopen("level1.txt","r");
-    if (fpi) {
-        nrows=0;
-        char line[100];
-        while (fgets(line, 100, fpi) != NULL) {
-            removeCrLf(line);
-            int slen = strlen(line);
-            ncols = slen;
-            //Log("line: %s\n", line);
-            for (int j=0; j<slen; j++) {
-                arr[nrows][j] = line[j];
-            }
-            ++nrows;
-        }
-        fclose(fpi);
-        //printf("nrows of background data: %i\n", nrows);
-    }
-    for (int i=0; i<nrows; i++) {
-        for (int j=0; j<ncols; j++) {
-            printf("%c", arr[i][j]);
-        }
-        printf("\n");
-    }
-}
-void Level::removeCrLf(char *str) {
-    //remove carriage return and linefeed from a Cstring
-    char *p = str;
-    while (*p) {
-        if (*p == 10 || *p == 13) {
-            *p = '\0';
-            break;
-        }
-        ++p;
-    }
-}
-
-//X Windows variables
-X11_wrapper::~X11_wrapper() {
-    XDestroyWindow(dpy, win);
-    XCloseDisplay(dpy);
-}
-void X11_wrapper::setTitle() {
-    //Set the window title bar.
-    XMapWindow(dpy, win);
-    XStoreName(dpy, win, "Family Chicken Bag");
-}
-void X11_wrapper::setupScreenRes(const int w, const int h) {
-    gl.xres = w;
-    gl.yres = h;
-}
-X11_wrapper::X11_wrapper() {
-    GLint att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None };
-    //GLint att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, None };
-    XSetWindowAttributes swa;
-    setupScreenRes(gl.xres, gl.yres);
-    dpy = XOpenDisplay(NULL);
-    if (dpy == NULL) {
-        printf("\n\tcannot connect to X server\n\n");
-        exit(EXIT_FAILURE);
-    }
-    Window root = DefaultRootWindow(dpy);
-    XVisualInfo *vi = glXChooseVisual(dpy, 0, att);
-    if (vi == NULL) {
-        printf("\n\tno appropriate visual found\n\n");
-        exit(EXIT_FAILURE);
-    } 
-    Colormap cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
-    swa.colormap = cmap;
-    swa.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask |
-        StructureNotifyMask | SubstructureNotifyMask;
-    win = XCreateWindow(dpy, root, 0, 0, gl.xres, gl.yres, 0,
-            vi->depth, InputOutput, vi->visual,
-            CWColormap | CWEventMask, &swa);
-    GLXContext glc = glXCreateContext(dpy, vi, NULL, GL_TRUE);
-    glXMakeCurrent(dpy, win, glc);
-    setTitle();
-}
-void X11_wrapper::reshapeWindow(int width, int height) {
-    //window has been resized.
-    setupScreenRes(width, height);
-    glViewport(0, 0, (GLint)width, (GLint)height);
-    glMatrixMode(GL_PROJECTION); glLoadIdentity();
-    glMatrixMode(GL_MODELVIEW); glLoadIdentity();
-    glOrtho(0, gl.xres, 0, gl.yres, -1, 1);
-    setTitle();
-}
-void X11_wrapper::checkResize(XEvent *e) {
-    //The ConfigureNotify is sent by the
-    //server if the window is resized.
-    if (e->type != ConfigureNotify)
-        return;
-    XConfigureEvent xce = e->xconfigure;
-    if (xce.width != gl.xres || xce.height != gl.yres) {
-        //Window size did change.
-        reshapeWindow(xce.width, xce.height);
-    }
-}
-bool X11_wrapper::getXPending() {
-    return XPending(dpy);
-}
-XEvent X11_wrapper::getXNextEvent() {
-    XEvent e;
-    XNextEvent(dpy, &e);
-    return e;
-}
-void X11_wrapper::swapBuffers() {
-    glXSwapBuffers(dpy, win);
-}
-
-Image::~Image() { delete [] data; }
-Image::Image(const char *fname) {
-    if (fname[0] == '\0')
-        return;
-    //printf("fname **%s**\n", fname);
-    int ppmFlag = 0;
-    char name[40];
-    strcpy(name, fname);
-    int slen = strlen(name);
-    char ppmname[80];
-    if (strncmp(name+(slen-4), ".ppm", 4) == 0)
-        ppmFlag = 1;
-    if (ppmFlag) {
-        strcpy(ppmname, name);
-    } else {
-        name[slen-4] = '\0';
-        //printf("name **%s**\n", name);
-        sprintf(ppmname,"%s.ppm", name);
-        //printf("ppmname **%s**\n", ppmname);
-
-        char ts[100];
-        //system("convert eball.jpg eball.ppm");
-        sprintf(ts, "convert %s %s", fname, ppmname);
-        system(ts);
-    }
-    //sprintf(ts, "%s", name);
-    //printf("read ppm **%s**\n", ppmname); fflush(stdout);
-    FILE *fpi = fopen(ppmname, "r");
-    if (fpi) {
-        char line[200];
-        fgets(line, 200, fpi);
-        fgets(line, 200, fpi);
-        //skip comments and blank lines
-        while (line[0] == '#' || strlen(line) < 2)
-            fgets(line, 200, fpi);
-        sscanf(line, "%i %i", &width, &height);
-        fgets(line, 200, fpi);
-        //get pixel data
-        int n = width * height * 3;			
-        data = new unsigned char[n];			
-        for (int i=0; i<n; i++)
-            data[i] = fgetc(fpi);
-        fclose(fpi);
-    } else {
-        printf("ERROR opening image: %s\n",ppmname);
-        exit(0);
-    }
-    if (!ppmFlag)
-        unlink(ppmname);
-}
 
 int main(void)
 {
@@ -973,11 +739,12 @@ void render(void)
                 glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
                 glBegin(GL_QUADS);
                 glVertex2i( 0,  0);
-                glVertex2i( 0, ty);
+                glVertex2i( 0, ty);	
                 glVertex2i(tx, ty);
                 glVertex2i(tx,  0);
                 glEnd();
                 glPopMatrix();
+		//cout << "\nbrown tile pos-> x: " << j*dd+offx << " y: " << i*lev.ftsz[1]+offy << endl;
             }
             if (lev.arr[row][col] == 'b') {
                 glColor3f(0.9, 0.2, 0.2);
@@ -990,6 +757,7 @@ void render(void)
                 glVertex2i(tx,  0);
                 glEnd();
                 glPopMatrix();
+		//cout << "\nred tile pos-> x: " << j*dd+offx << " y: " << i*lev.ftsz[1]+offy << endl;
             }
             if (lev.arr[row][col] == 'r') {	
                 glColor3f(75, 0, 130);
