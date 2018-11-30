@@ -1,3 +1,11 @@
+/*What this file includes
+	Collision Class
+	Enemy Class
+
+	Important Notes:
+		All uses of this class are being put instantly
+		into the main cpp file. None are in Anthony.cpp
+*/
 #ifndef anthonyR_H
 #define anthonyR_H
 

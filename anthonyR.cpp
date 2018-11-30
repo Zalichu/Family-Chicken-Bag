@@ -5,6 +5,9 @@
 // 	My Name
 //  Pause Menu
 //  Color System
+//  Many Rendered Images
+//  User Interface
+//	Some Misc. Functions
 
 #include <iostream>
 #include "fonts.h"
@@ -14,6 +17,7 @@
 #include <string>
 
 extern Collision A;
+extern Enemy enemy1;
 
 using namespace std;
 
