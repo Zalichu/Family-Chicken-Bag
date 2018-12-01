@@ -22,6 +22,7 @@ extern int locationX;
 extern Global gl;
 
 static int playerScore = 0;
+int currentLevel = 1;
 int enemy1Count = 0; //To keep count of how many points to give
 
 using namespace std;
@@ -204,7 +205,9 @@ void Controls_UI(int x, int y) //WIP
     glEnd();
     glPopMatrix();	
 	string SplayerScore = to_string(playerScore);
+	string ScurrentLevel = to_string(currentLevel);
 	showText(x-52, y-90, colorFont("green"), ("SCORE: " + SplayerScore));
+	showText(x-52, y-110, colorFont("green"), ("Level: " + ScurrentLevel));
 	//showText(int x, int y, int colorText, const char* text)
 	showText(x-52, y-8, colorFont("yellow"), "Q | Kick");
 	showText(x-52, y-28, colorFont("yellow"), "R | Punch");
@@ -300,11 +303,6 @@ void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j,
 				playerScore++;
 		}
 	}
-}
-
-void IncreaseScore()
-{
-	playerScore++;
 }
 
 /* MISC. FUNCTIONS
