@@ -65,6 +65,7 @@ public:
 	int xres, yres;
 	int movie, movieStep;
 	int walk;
+	int gscore;
     int punch;
 	int walkFrame;
 	double delay;

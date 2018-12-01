@@ -615,7 +615,7 @@ void physics(void)
 
 }
 extern int colorFont(std::string);
-extern void showText(int, int, int, const char*);	
+extern void showText(int, int, int, string);	
 void render(void)
 {
     //Clear the screen

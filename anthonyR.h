@@ -9,7 +9,6 @@
 #ifndef anthonyR_H
 #define anthonyR_H
 
-#include <iostream>
 
 class Collision {
 public:

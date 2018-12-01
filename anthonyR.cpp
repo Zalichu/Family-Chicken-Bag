@@ -21,10 +21,13 @@ extern Enemy enemy1;
 extern int locationX;
 extern Global gl;
 
+static int playerScore = 0;
+int enemy1Count = 0; //To keep count of how many points to give
+
 using namespace std;
 
 int colorFont(string);
-void showText(int x, int y, int colorText, const char* text);
+void showText(int x, int y, int colorText, string text);
 
 /* TEXT FUNCTIONS 
 --------------------------------------------------------------*/
@@ -45,14 +48,15 @@ void showAnthonyName(int x, int y)
 	ggprint8b(&c, 16, colorFont("white"), "Anthony Rodriguez");
 }
 
-void showText(int x, int y, int colorText, const char* text)
+void showText(int x, int y, int colorText, string text)
 {
 	//TextBox Function
+	const char *tex = text.c_str(); //Converting string to const char*
 	Rect credit;
 	credit.bot = y + 50;
 	credit.left = x;
 	credit.center = 0;
-	ggprint8b(&credit, 16, colorText, text);
+	ggprint8b(&credit, 16, colorText, tex);
 }
 
 /*	GRAPHICS
@@ -199,7 +203,8 @@ void Controls_UI(int x, int y) //WIP
     	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -height);
     glEnd();
     glPopMatrix();	
-	showText(x-52, y-90, colorFont("green"), "SCORE: ");
+	string SplayerScore = to_string(playerScore);
+	showText(x-52, y-90, colorFont("green"), ("SCORE: " + SplayerScore));
 	//showText(int x, int y, int colorText, const char* text)
 	showText(x-52, y-8, colorFont("yellow"), "Q | Kick");
 	showText(x-52, y-28, colorFont("yellow"), "R | Punch");
@@ -245,6 +250,7 @@ void DEBUG(int x, int y) //WIP
 	showText(x-52, y-33, colorFont("yellow"), "damage done: ");
 	showText(x-52, y-49, colorFont("yellow"), "hit detected: ");
 }
+
 /*LOGIC FUNCTIONS 
 --------------------------------------------------------------*/
 
@@ -289,7 +295,16 @@ void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j,
 			enemyHealth(locationX, 170, enemyA.health, 14, enemyA);
 		if (enemyA.health != 0)
     		showText(locationX, 80, colorFont("red"), " Enemy Health");
+		if (enemyA.health <= 0) {
+			if (++enemy1Count <= 1)
+				playerScore++;
+		}
 	}
+}
+
+void IncreaseScore()
+{
+	playerScore++;
 }
 
 /* MISC. FUNCTIONS
