@@ -1,11 +1,10 @@
 //Author: Anthony Rodriguez
 
 //What this file includes:
-//	Credits
-// 	My Name
-//  Pause Menu
 //  Color System
-//  Many Rendered Images
+//  Collision Logic 
+//  Many Rendered Images 
+//  Functionality Improvements
 //  User Interface
 //	Some Misc. Functions
 
@@ -16,6 +15,9 @@
 #include "global.h"
 #include <string>
 
+using namespace std;
+
+extern Image *img;
 extern Collision A;
 extern Enemy enemy1;
 extern int locationX;
@@ -24,8 +26,6 @@ extern Global gl;
 static int playerScore = 0;
 int currentLevel = 1;
 int enemy1Count = 0; //To keep count of how many points to give
-
-using namespace std;
 
 int colorFont(string);
 void showText(int x, int y, int colorText, string text);
@@ -62,6 +62,35 @@ void showText(int x, int y, int colorText, string text)
 
 /*	GRAPHICS
 --------------------------------------------------------------*/
+//Note: These are the new and improved graphics functions
+void intializeTexture(int index, GLuint texid) //Every Image needs
+{
+    glGenTextures(1, &texid);
+    int frameW = img[index].width; 
+    int frameH = img[index].height; 
+    glBindTexture(GL_TEXTURE_2D, texid);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, 3, frameW, frameH, 0, GL_RGB,
+            GL_UNSIGNED_BYTE, img[index].data);
+    glViewport(0, 0, gl.xres, gl.yres);	
+}
+
+void showTexture(int x, int y, int wid, int height, GLuint texid) 
+{
+    glPushMatrix();
+    glTranslatef(x, y, 0);
+    glBindTexture(GL_TEXTURE_2D, texid);
+    glBegin(GL_QUADS);
+    	glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -height);
+    	glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, height);
+    	glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, height);
+    	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -height);
+    glEnd();
+    glPopMatrix();
+} 
+//Note: Graphic functions down here are before I knew how header files
+// worked. It's very inefficient.
 void showAnthonyPicture(int x, int y, GLuint texid)
 {
     glColor3ub(255, 255, 255);
@@ -256,7 +285,6 @@ void DEBUG(int x, int y) //WIP
 
 /*LOGIC FUNCTIONS 
 --------------------------------------------------------------*/
-
 bool Collision::Within_Range(int range) {
 	if (range > 400 && range < 600) {
 		this->range = range;
@@ -289,8 +317,7 @@ void checkCollision()
 {
 	if (A.Within_Range(locationX)) {
 		std::cout << " - in range ";
-		if (A.Punching(gl.punch) == true)
-		{
+		if (A.Punching(gl.punch) == true) {
 			std::cout << " - Dmg: " << A.Damage();
 			enemy1.health -= A.Damage();
 			std::cout << " - ENEMY HEALTH: " << enemy1.health;
