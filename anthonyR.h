@@ -27,30 +27,10 @@ public:
 		range = 1000;
 		restrict = false;
 	}
-	bool Within_Range(int range) {
-		if (range > 400 && range < 600) {
-			this->range = range;
-			return true;
-		}
-		return false;
-	}
-	bool Punching(bool flag) {
-		punching = flag;
-		return flag;
-	}
-	int Damage() {
-		if (restrict == true)	
-			return 20;
-		if (punching == true)
-			return 0;
-		return 20;		
-	}
-	void Check_For_Hit() {
-		if (punching) {
-			contact = true;
-			//Damage();
-		}		
-	}
+	bool Within_Range(int range); 
+	bool Punching(bool flag);
+	int Damage(); 
+	void Check_For_Hit(); 
 };
 
 class Enemy {

@@ -257,6 +257,34 @@ void DEBUG(int x, int y) //WIP
 /*LOGIC FUNCTIONS 
 --------------------------------------------------------------*/
 
+bool Collision::Within_Range(int range) {
+	if (range > 400 && range < 600) {
+		this->range = range;
+		return true;
+	}
+	return false;
+}
+
+bool Collision::Punching(bool flag) {
+	punching = flag;
+	return flag;
+}
+
+int Collision::Damage() {
+	if (restrict == true)	
+		return 20;
+	if (punching == true)
+		return 0;
+	return 20;		
+}
+
+void Collision::Check_For_Hit() {
+	if (punching) {
+		contact = true;
+		//Damage();
+	}		
+}
+
 void checkCollision()
 {
 	if (A.Within_Range(locationX)) {
