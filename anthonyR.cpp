@@ -13,11 +13,13 @@
 #include "fonts.h"
 #include <GL/glx.h>
 #include "anthonyR.h"
-#include "emmanuelC.h"
+#include "global.h"
 #include <string>
 
 extern Collision A;
 extern Enemy enemy1;
+extern int locationX;
+extern Global gl;
 
 using namespace std;
 
@@ -125,7 +127,7 @@ void showHealth(int x, int y, int playerHealth, GLuint texid)
 void enemyHealth(int x, int y, int wid, int height, Enemy &enemy1)
 {
 	wid = enemy1.health;
-	glColor3ub(75,0.2,130);
+	glColor3ub(229,31,31);
 	glPushMatrix();
 	glTranslatef(x,y,0);
 	glBegin(GL_QUADS);	
@@ -243,6 +245,53 @@ void DEBUG(int x, int y) //WIP
 	showText(x-52, y-33, colorFont("yellow"), "damage done: ");
 	showText(x-52, y-49, colorFont("yellow"), "hit detected: ");
 }
+/*LOGIC FUNCTIONS 
+--------------------------------------------------------------*/
+
+void checkCollision()
+{
+	if (A.Within_Range(locationX)) {
+		std::cout << " - in range ";
+		if (A.Punching(gl.punch) == true)
+		{
+			std::cout << " - Dmg: " << A.Damage();
+			enemy1.health -= A.Damage();
+			std::cout << " - ENEMY HEALTH: " << enemy1.health;
+			A.restrict = false;
+		}
+	}
+}
+
+void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j, 
+						int tx, int ty, Flt dd, Flt offy, Flt offx,
+						int col, int row) 
+{
+	extern Level lev;
+	
+	if (lev.arr[row][col] == eLetter) {
+		locationX = (Flt)j*dd+offx;
+		A.Within_Range(locationX);
+				
+		std::cout << locationX;
+
+        glColor3f(75, 0, 130);
+        glPushMatrix();
+        glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+        glBegin(GL_QUADS);
+        	glVertex2i( 0,  0);
+         	glVertex2i( 0, ty);
+            glVertex2i(tx, ty);
+            glVertex2i(tx,  0);
+        glEnd();
+        glPopMatrix();
+		if (enemyA.health < 0) 
+				enemyA.health = 0;
+			enemyHealth(locationX, 170, enemyA.health, 14, enemyA);
+		if (enemyA.health != 0)
+    		showText(locationX, 80, colorFont("red"), " Enemy Health");
+	}
+}
+
 /* MISC. FUNCTIONS
 --------------------------------------------------------------*/
 int colorFont(string colorChoice)

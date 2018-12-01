@@ -76,7 +76,9 @@ void render();
 int locationX;
 Collision A;
 Enemy enemy1;
-
+void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j, 
+						int tx, int ty, Flt dd, Flt offy, Flt offx,
+						int col, int row); 
 int main(void)
 {
     srand (time(NULL));
@@ -772,7 +774,7 @@ void render(void)
                 glPopMatrix();
             }
 
-			extern void enemyHealth(int x, int y, int w, int h, Enemy &enemy1);
+			/*extern void enemyHealth(int x, int y, int w, int h, Enemy &enemy1);
             if (lev.arr[row][col] == 'c') {
 				locationX = (Flt)j*dd+offx;
 				A.Within_Range(locationX);
@@ -793,7 +795,8 @@ void render(void)
 					enemy1.health = 0;
 				enemyHealth(locationX, 170, enemy1.health, 14, enemy1);
     			showText(locationX, 80, colorFont("red"), " Enemy Health");
-            }
+            }*/
+			createEnemyHitbox('c', enemy1, i, j, tx, ty, dd, offy, offx, col, row);
             --row;
         }
         col = (col+1) % lev.ncols;
@@ -877,17 +880,10 @@ void render(void)
     //arrowKeysPicture(500, 500, gl.keysTexture);
 	
 	//Collision
-	if (A.Within_Range(locationX)) {
-		std::cout << " - in range ";
-		if (A.Punching(gl.punch) == true)
-		{
-			std::cout << " - Dmg: " << A.Damage();
-			enemy1.health -= A.Damage();
-			std::cout << " - ENEMY HEALTH: " << enemy1.health;
-			A.restrict = false;
-		}
-	}
+	extern void checkCollision();
+	checkCollision();
 	std::cout << std::endl;
+
     /*	unsigned int c = 0x00ffff44;
         r.bot = gl.yres - 20;
         r.left = 10;
