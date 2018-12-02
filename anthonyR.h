@@ -8,7 +8,7 @@
 */
 #ifndef anthonyR_H
 #define anthonyR_H
-
+#include "emmanuelC.h"
 
 class Collision {
 public:
@@ -38,5 +38,6 @@ public:
 	int health;
 	Enemy() { health = 100; }
 };
+
 #endif
 

@@ -103,17 +103,19 @@ int main(void)
 
 unsigned char *buildAlphaData(Image *img)
 {
-    //TRANSPARENCY FUNCTION
+    //add 4th component to RGB stream...
+    int i;
     unsigned char *newdata, *ptr;
     unsigned char *data = (unsigned char *)img->data;
-    newdata = (unsigned char *)malloc(img->width * img->height * 4);
+    newdata = (unsigned char *)malloc(img->width * img->height * 4); 
     ptr = newdata;
     unsigned char a,b,c;
     //use the first pixel in the image as the transparent color.
     unsigned char t0 = *(data+0);
     unsigned char t1 = *(data+1);
     unsigned char t2 = *(data+2);
-    for (int i=0; i<img->width * img->height * 3; i+=3) {
+    //cout << "buildAlphaData() clear color is:  (" << (int)t0 << ", " << (int)t1 << ", " << (int)t2 << ")" << endl;
+    for (i=0; i<img->width * img->height * 3; i+=3) {
         a = *(data+0);
         b = *(data+1);
         c = *(data+2);
@@ -126,7 +128,7 @@ unsigned char *buildAlphaData(Image *img)
         //-----------------------------------------------
         ptr += 4;
         data += 3;
-    }
+    }   
     return newdata;
 }
 

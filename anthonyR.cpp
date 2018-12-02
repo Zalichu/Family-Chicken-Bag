@@ -3,7 +3,7 @@
 //What this file includes:
 //  Color System
 //  Collision Logic 
-//  Many Rendered Images 
+//  Many Rendered Images/Functions 
 //  Functionality Improvements
 //  User Interface
 //	Some Misc. Functions
@@ -18,6 +18,7 @@
 using namespace std;
 
 extern Image *img;
+extern unsigned char *buildAlphaData(Image *img);
 extern Collision A;
 extern Enemy enemy1;
 extern int locationX;
@@ -76,19 +77,38 @@ void intializeTexture(int index, GLuint texid) //Every Image needs
     glViewport(0, 0, gl.xres, gl.yres);	
 }
 
-void showTexture(int x, int y, int wid, int height, GLuint texid) 
+void makeTransparent(GLuint *tex, Image img)
+{
+    glGenTextures(1, tex);
+    int w = img.width;
+    int h = img.height;
+    glBindTexture(GL_TEXTURE_2D, *tex);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST); 
+    unsigned char *xData = buildAlphaData(&img);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
+        GL_RGBA, GL_UNSIGNED_BYTE, xData);
+    free(xData);
+}
+
+void showImage(int x, int y, int width, int height, GLuint texid)
 {
     glPushMatrix();
-    glTranslatef(x, y, 0);
+    glColor3ub(255,255,255);
+    glTranslatef(x, y, 0); 
     glBindTexture(GL_TEXTURE_2D, texid);
+    glEnable(GL_ALPHA_TEST);
+    glAlphaFunc(GL_GREATER, 0.0f);
     glBegin(GL_QUADS);
-    	glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -height);
-    	glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, height);
-    	glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, height);
-    	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -height);
+        glTexCoord2f(0.0f, 1.0f); glVertex2i(-width/2, -height/2);
+        glTexCoord2f(1.0f, 1.0f); glVertex2i(width/2, -height/2);
+        glTexCoord2f(1.0f, 0.0f); glVertex2i(width/2, height/2);
+        glTexCoord2f(0.0f, 0.0f); glVertex2i(-width/2, height/2);
     glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0); 
     glPopMatrix();
-} 
+}
+
 //Note: Graphic functions down here are before I knew how header files
 // worked. It's very inefficient.
 void showAnthonyPicture(int x, int y, GLuint texid)
@@ -109,7 +129,8 @@ void showAnthonyPicture(int x, int y, GLuint texid)
 
 void showHealthbar(int x, int y, GLuint texid)
 {
-    glColor3ub(255, 255, 255);
+    
+	glColor3ub(255, 255, 255);
     int wid = 80;
 	int height = 80;
     glPushMatrix();
