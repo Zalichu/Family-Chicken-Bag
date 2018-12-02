@@ -64,6 +64,7 @@ Global::~Global() {
 }
 Global::Global() {
     playerHealth = 80;
+	Title = true;
     menu = false;
     credits = 0;
     background= false;

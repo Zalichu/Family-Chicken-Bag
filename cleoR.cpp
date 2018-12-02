@@ -1,7 +1,7 @@
-// 
+// CS3350 - Software Engineering 
+// Cleophas Reaves III
+// Last Modified: 11/30/ 18
 //
-//  
- 
 
 #include <iostream>
 #include "fonts.h"
@@ -28,7 +28,7 @@ void showCleoPicture(int x, int y, GLuint texid)
     angle += 0.2f;
     */ 
 
-    glColor3ub(255, 255, 255);
+       glColor3ub(255, 255, 255);
        int wid=40;
        glPushMatrix();
        glTranslatef(x, y, 0);
@@ -38,6 +38,24 @@ void showCleoPicture(int x, int y, GLuint texid)
             glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, wid);
             glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, wid);
             glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -wid);
+       glEnd();
+       glPopMatrix();
+}
+
+
+void showTitlePic(int x, int y, GLuint texid)
+{
+       glColor3ub(255, 255, 255);
+       int wid=400;
+       int hgt=300;
+       glPushMatrix();
+       glTranslatef(x, y, 0);
+       glBindTexture(GL_TEXTURE_2D, texid);
+       glBegin(GL_QUADS);
+            glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -hgt);
+            glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, hgt);
+            glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, hgt);
+            glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -hgt);
        glEnd();
        glPopMatrix();
 }
