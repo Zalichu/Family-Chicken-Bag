@@ -65,13 +65,14 @@ public:
 	int xres, yres;
 	int movie, movieStep;
 	int walk;
-    	int punch;
+   int punch;
 	int walkFrame;
 	double delay;
 	bool credits; //Added
 	bool menu; // Added
 	bool Title;
 	bool background; // fixed background
+	char last_position;
 	Image *walkImage;
 	GLuint walkTexture;
 	Vec box[20];
