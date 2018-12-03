@@ -64,14 +64,28 @@ Global::~Global() {
 }
 Global::Global() {
     playerHealth = 80;
+<<<<<<< HEAD
+    Title = true;
     End = false;
+=======
 	showDeath = true;
 	 Title = true;
+>>>>>>> f47d78abbc6fadcafafc75cb898ab3d3b0b17392
     menu = false;
     credits = 0;
     background= false;
     logOpen();
     camera[0] = camera[1] = 0.0;
+<<<<<<< HEAD
+    movie = 0;
+    movieStep = 2;
+    xres = 800;
+    yres = 600;
+    walk = 0;
+    punch = 0;
+    walkFrame = 0;
+    walkImage = NULL;
+=======
     movie=0;
     movieStep=2;
     xres=800;
@@ -81,6 +95,7 @@ Global::Global() {
     walkFrame=0;
     walkImage=NULL;
 	 last_position='r';
+>>>>>>> f47d78abbc6fadcafafc75cb898ab3d3b0b17392
     MakeVector(ball_pos, 520.0, 0, 0);
     MakeVector(ball_vel, 0, 0, 0);
     delay = 0.1;

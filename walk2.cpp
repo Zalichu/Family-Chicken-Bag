@@ -28,7 +28,7 @@ extern Global gl;
 extern Level lev;
 extern X11_wrapper x11;
 
-Image img[13] = {
+Image img[15] = {
     "./images/walk.gif",
     "./images/exp.png",
     "./images/exp44.png",
@@ -42,6 +42,8 @@ Image img[13] = {
     "./images/objects/arrowKeys.png",
     "./images/FCBTitle.png",
     "./images/FCBEnd.png",	    
+	"./images/spike.png",
+	"./images/death.gif"
 };
 
 Image backgroundImg[2] = {
@@ -78,9 +80,17 @@ void render();
 int locationX;
 Collision A;
 Enemy enemy1;
+Peter peter;
+Spike spike1;
 void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j, 
 						int tx, int ty, Flt dd, Flt offy, Flt offx,
-						int col, int row); 
+						int col, int row);
+void createSpike(char eLetter, Spike &spikeA, int i, int j, 
+						int tx, int ty, Flt dd, Flt offy, Flt offx,
+						int col, int row);
+extern void makeTransparent(GLuint *tex, Image *img);
+extern void showImage(int,int,int,int,GLuint);	
+
 int main(void)
 {
     srand (time(NULL));
@@ -104,17 +114,19 @@ int main(void)
 
 unsigned char *buildAlphaData(Image *img)
 {
-    //TRANSPARENCY FUNCTION
+    //add 4th component to RGB stream...
+    int i;
     unsigned char *newdata, *ptr;
     unsigned char *data = (unsigned char *)img->data;
-    newdata = (unsigned char *)malloc(img->width * img->height * 4);
+    newdata = (unsigned char *)malloc(img->width * img->height * 4); 
     ptr = newdata;
     unsigned char a,b,c;
     //use the first pixel in the image as the transparent color.
     unsigned char t0 = *(data+0);
     unsigned char t1 = *(data+1);
     unsigned char t2 = *(data+2);
-    for (int i=0; i<img->width * img->height * 3; i+=3) {
+    //cout << "buildAlphaData() clear color is:  (" << (int)t0 << ", " << (int)t1 << ", " << (int)t2 << ")" << endl;
+    for (i=0; i<img->width * img->height * 3; i+=3) {
         a = *(data+0);
         b = *(data+1);
         c = *(data+2);
@@ -127,7 +139,7 @@ unsigned char *buildAlphaData(Image *img)
         //-----------------------------------------------
         ptr += 4;
         data += 3;
-    }
+    }   
     return newdata;
 }
 
@@ -241,13 +253,38 @@ void initOpengl(void)
     glGenTextures(1, &gl.endTexture);
     int EimageW = img[12].width; 
     int EimageH = img[12].height; 
-    glBindTexture(GL_TEXTURE_2D, gl.titleTexture);
+    glBindTexture(GL_TEXTURE_2D, gl.endTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D,0,3,EimageW,EimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[12].data);
     glViewport(0, 0, gl.xres, gl.yres);
 
     //Initialize matrices
+
+	//Spike 	
+    glGenTextures(1, &gl.spikeTexture);
+    int SimageW = img[13].width; 
+    int SimageH = img[13].height; 
+    glBindTexture(GL_TEXTURE_2D, gl.spikeTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D,0,3,SimageW,SimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[13].data);
+    glViewport(0, 0, gl.xres, gl.yres);
+	makeTransparent(&gl.spikeTexture, &img[13]);
+
+	    
+	//Death Character 	
+    glGenTextures(1, &gl.deathTexture);
+    int DimageW = img[14].width; 
+    int DimageH = img[14].height; 
+    glBindTexture(GL_TEXTURE_2D, gl.deathTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D,0,3,DimageW,DimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[14].data);
+    glViewport(0, 0, gl.xres, gl.yres);
+	makeTransparent(&gl.deathTexture, &img[14]);
+
+	//Initialize matrices
     glMatrixMode(GL_PROJECTION); glLoadIdentity();
     glMatrixMode(GL_MODELVIEW); glLoadIdentity();
 
@@ -566,7 +603,8 @@ void physics(void)
                 gl.camera[0] -= 2.0/lev.tilesize[0] * (0.05 / gl.delay);
                 if (gl.camera[0] < 0.0)
                     gl.camera[0] = 0.0;
-            } else {
+            } 
+				else if (gl.keys[XK_Right]) {
                 gl.box[i][0] -= 1.0 * (0.05 / gl.delay);
                 if (gl.box[i][0] < -10.0)
                     gl.box[i][0] += gl.xres + 10.0;
@@ -579,12 +617,20 @@ void physics(void)
         if (gl.punch){
             extern int showPunch(int);
             countp = showPunch(countp);
-            if (countp >= 14) {
+            if (countp >= 7) {
                 gl.punch ^= 1;
                 countp = 0;
             }
         }
-    if (gl.exp.onoff) {
+
+      extern int physicsChicken();
+		int countc = physicsChicken();
+		if (countc >= 14) {
+			//activation here
+		}
+			
+		
+	  if (gl.exp.onoff) {
         //explosion is happening
         timers.recordTime(&timers.timeCurrent);
         double timeSpan = timers.timeDiff(&gl.exp.time, &timers.timeCurrent);
@@ -653,13 +699,13 @@ void render(void)
         showTitlePic(400,300,gl.titleTexture);	
 	return;
     }
-    if (gl.End) {
-	std::cout << gl.End << std::endl;
-	glClearColor(0.1, 0.1, 0.1, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT);
+    if (peter.health <= 0) {
+   	//std::cout << gl.End << std::endl;
+    	glClearColor(0.1, 0.1, 0.1, 1.0);
+    	glClear(GL_COLOR_BUFFER_BIT);
 	extern void showEndPic(int x, int y, GLuint txt);
         showEndPic(400,300,gl.endTexture);	
-	return;
+    	return;
     }
 
     //Clear the screen
@@ -840,6 +886,8 @@ void render(void)
 				enemyHealth(locationX, 170, enemy1.health, 14, enemy1);
     			showText(locationX, 80, colorFont("red"), " Enemy Health");
             }*/
+			
+			createSpike('s', spike1, i, j, tx, ty, dd, offy, offx, col, row);
 			createEnemyHitbox('c', enemy1, i, j, tx, ty, dd, offy, offx, col, row);
             --row;
         }
@@ -888,12 +936,30 @@ void render(void)
         glTexCoord2f(fx+.125, fy);    glVertex2i(cx-w, cy+h);
         glTexCoord2f(fx,      fy);    glVertex2i(cx+w, cy+h);
         glTexCoord2f(fx,      fy+.5); glVertex2i(cx+w, cy-h);
-    } else {
+		  gl.last_position = 'l';
+    } 
+	 else if (gl.keys[XK_Right]) {
         glTexCoord2f(fx,      fy+.5); glVertex2i(cx-w, cy-h);
         glTexCoord2f(fx,      fy);    glVertex2i(cx-w, cy+h);
         glTexCoord2f(fx+.125, fy);    glVertex2i(cx+w, cy+h);
         glTexCoord2f(fx+.125, fy+.5); glVertex2i(cx+w, cy-h);
+		  gl.last_position = 'r';
     }
+	 else {
+		if (gl.last_position == 'l') {
+        glTexCoord2f(fx+.125, fy+.5); glVertex2i(cx-w, cy-h);
+        glTexCoord2f(fx+.125, fy);    glVertex2i(cx-w, cy+h);
+        glTexCoord2f(fx,      fy);    glVertex2i(cx+w, cy+h);
+        glTexCoord2f(fx,      fy+.5); glVertex2i(cx+w, cy-h);
+		}
+		else {
+        glTexCoord2f(fx,      fy+.5); glVertex2i(cx-w, cy-h);
+        glTexCoord2f(fx,      fy);    glVertex2i(cx-w, cy+h);
+        glTexCoord2f(fx+.125, fy);    glVertex2i(cx+w, cy+h);
+        glTexCoord2f(fx+.125, fy+.5); glVertex2i(cx+w, cy-h);
+		}
+	 }
+	 
     glEnd();
     glPopMatrix();
 
@@ -906,7 +972,6 @@ void render(void)
     showHealthbar(100 ,500 ,gl.healthbarTexture);
 
     //For Text Color
-
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_ALPHA_TEST);
 
@@ -918,11 +983,19 @@ void render(void)
     extern void Controls_UI(int, int);
     Controls_UI(620,515);
 
-	//DEBUG for Collision
-	extern void DEBUG(int, int);
-	DEBUG(100,100);
     //arrowKeysPicture(500, 500, gl.keysTexture);
-	
+
+	//Test
+	//showImage(200,200,100,100,gl.spikeTexture);
+	//std::cout << "peterX: " << peter.x;
+	makeTransparent(&gl.deathTexture, &img[14]);
+
+	//Show Enemies 
+	if (enemy1.showImage == true)
+		showImage(enemy1.x, enemy1.y, 200, 200, gl.deathTexture);	
+	if (enemy1.showImage == false)
+		showImage(0,0,0,0,gl.deathTexture);	
+
 	//Collision
 	extern void checkCollision();
 	checkCollision();

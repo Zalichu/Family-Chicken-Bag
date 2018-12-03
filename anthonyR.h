@@ -2,13 +2,33 @@
 	Collision Class
 	Enemy Class
 
-	Important Notes:
-		All uses of this class are being put instantly
-		into the main cpp file. None are in Anthony.cpp
 */
 #ifndef anthonyR_H
 #define anthonyR_H
+#include "emmanuelC.h"
 
+extern Global gl;
+
+class Peter {
+public:
+	int health;
+	int x;
+	int y;
+	int xHitBoxLEFT;
+	int xHitBoxRIGHT;
+	int yHitBoxLEFT;
+	int yHitBoxRIGHT;
+	Peter() {
+		x = 400;	
+		y = 0;
+		xHitBoxLEFT = 0;
+		xHitBoxRIGHT = 0;
+		yHitBoxLEFT = 0;
+		yHitBoxRIGHT = 0;
+		health = 80;
+	}
+	bool Alive();
+};
 
 class Collision {
 public:
@@ -16,7 +36,9 @@ public:
 	bool punching;
 	bool range;
 	bool restrict;
-
+	int collisionX;
+	int collisionY;
+	int peterY;
 	enum moveSet {
 		Punch = 0	
 	};
@@ -26,6 +48,9 @@ public:
 		punching = false;
 		range = 1000;
 		restrict = false;
+		peterY = 0;
+		collisionX = 0;
+		collisionY = 0;
 	}
 	bool Within_Range(int range); 
 	bool Punching(bool flag);
@@ -36,7 +61,50 @@ public:
 class Enemy {
 public:
 	int health;
-	Enemy() { health = 100; }
+	int x;
+	int y;
+	bool showImage;
+	Enemy() 
+	{
+		x = 0;
+		y = 0; 
+		health = 100; 
+		showImage = true;
+	}
+};
+
+class Spike {
+public:
+	int xHitBoxLEFT;
+	int xHitBoxRIGHT;
+	int yHitBoxBOTTOM;
+	int yHitBoxTOP;
+	Spike()
+	{
+		xHitBoxLEFT = 290; //Fixed Locations for every Spike
+		xHitBoxRIGHT = 520;
+		yHitBoxBOTTOM = 0;
+		yHitBoxTOP = 0;
+	}
+	bool Spike_Collision();
+	void Within_Range(int x, int y, Peter &peter);
+};
+
+class Death {
+public:
+	int xHitBoxLEFT;
+	int xHitBoxRIGHT;
+	int yHitBoxBOTTOM;
+	int yHitBoxTOP;
+	Death()
+	{
+		xHitBoxLEFT = 290; //Fixed Locations for every Spike
+		xHitBoxRIGHT = 520;
+		yHitBoxBOTTOM = 0;
+		yHitBoxTOP = 0;
+	}
+	//bool Spike_Collision();
+	//void Within_Range(int x, int y, Peter &peter);
 };
 #endif
 

@@ -6,8 +6,12 @@
 #include <iostream>
 #include "fonts.h"
 #include <GL/glx.h>
+#include "anthonyR.h"
+#include "emmanuelC.h"
 
 using namespace std;
+
+extern Peter peter;
 
 void showCleoName(int x, int y) {
     Rect r;
@@ -57,8 +61,9 @@ void showTitlePic(int x, int y, GLuint texid) {
        glPopMatrix();
 }
 
-void gameOver(int x, int y, GLuint texid) {
-	if (playerHealth <= 0) {
+void showEndPic(int x, int y, GLuint texid) {
+	if (peter.health <= 0) {
+		std::cout << "Player H: " << peter.health << std::endl;
 		glColor3ub(255, 255, 255);
 		int wid=400;
 		int hgt=300;

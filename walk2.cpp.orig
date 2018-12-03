@@ -5,10 +5,11 @@
     multiple sprite-sheet animations
     a level tiling system
     parallax scrolling of backgrounds
-    */
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <unistd.h>
 #include <time.h>
 #include <math.h>
@@ -21,14 +22,17 @@
 #include <iostream>
 #include "anthonyR.h"
 #include "emmanuelC.h"
-using namespace std; 
 
 extern Timers timers;
 extern Global gl;
 extern Level lev;
 extern X11_wrapper x11;
 
-Image img[12] = {
+<<<<<<< HEAD
+Image img[13] = {
+=======
+Image img[14] = {
+>>>>>>> f47d78abbc6fadcafafc75cb898ab3d3b0b17392
     "./images/walk.gif",
     "./images/exp.png",
     "./images/exp44.png",
@@ -40,7 +44,14 @@ Image img[12] = {
     "./images/objects/HealthBarUI.png",
     "./images/objects/health.png",
     "./images/objects/arrowKeys.png",
-    "./images/FCBTitle.png"	    
+<<<<<<< HEAD
+    "./images/FCBTitle.png",
+    "./images/FCBEnd.png",	    
+=======
+    "./images/FCBTitle.png",	    
+	"./images/spike.png",
+	"./images/death.gif"
+>>>>>>> f47d78abbc6fadcafafc75cb898ab3d3b0b17392
 };
 
 Image backgroundImg[2] = {
@@ -77,249 +88,17 @@ void render();
 int locationX;
 Collision A;
 Enemy enemy1;
-<<<<<<< HEAD
+Peter peter;
+Spike spike1;
 void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j, 
 						int tx, int ty, Flt dd, Flt offy, Flt offx,
-						int col, int row); 
-=======
-/*	SETUP TIMERS
-    -----------------------------------------------------------------------------*/
-Timers::Timers() {
-    physicsRate = 1.0 / 30.0;
-    oobillion = 1.0 / 1e9;
-}
-double Timers::timeDiff(struct timespec *start, struct timespec *end) {
-    return (double)(end->tv_sec - start->tv_sec ) +
-        (double)(end->tv_nsec - start->tv_nsec) * oobillion;
-}
-void Timers::timeCopy(struct timespec *dest, struct timespec *source) {
-    memcpy(dest, source, sizeof(struct timespec));
-}
-void Timers::recordTime(struct timespec *t) {
-    clock_gettime(CLOCK_REALTIME, t);
-}
-//-----------------------------------------------------------------------------
+						int col, int row);
+void createSpike(char eLetter, Spike &spikeA, int i, int j, 
+						int tx, int ty, Flt dd, Flt offy, Flt offx,
+						int col, int row);
+extern void makeTransparent(GLuint *tex, Image *img);
+extern void showImage(int,int,int,int,GLuint);	
 
-
-// Past image class here. if it did not work.
-
-class Image;
-
-
-Sprite::Sprite() {
-    onoff = 0;
-    frame = 0;
-    image = NULL;
-    delay = 0.1;
-}
-
-
-Global::~Global() {
-    logClose();
-}
-Global::Global() {
-    playerHealth = 80;
-    menu = false;
-    Title = true;
-    credits = false;
-    background = false;
-    logOpen();
-    camera[0] = camera[1] = 0.0;
-    movie=0;
-    movieStep=2;
-    xres=800;
-    yres=600;
-    walk=0;
-    punch=0;
-    walkFrame=0;
-    walkImage=NULL;
-    MakeVector(ball_pos, 520.0, 0, 0);
-    MakeVector(ball_vel, 0, 0, 0);
-    delay = 0.1;
-    exp.onoff=0;
-    exp.frame=0;
-    exp.image=NULL;
-    exp.delay = 0.02;
-    exp44.onoff=0;
-    exp44.frame=0;
-    exp44.image=NULL;
-    exp44.delay = 0.022;
-    for (int i=0; i<20; i++) {
-        box[i][0] = rnd() * xres;
-        box[i][1] = rnd() * (yres-220) + 270; //Image Movement
-        box[i][2] = 0.0;
-    }
-    memset(keys, 0, 65536);
-}
-
-Level::Level() {
-    tilesize[0] = 32;
-    tilesize[1] = 32;
-    ftsz[0] = (Flt)tilesize[0];
-    ftsz[1] = (Flt)tilesize[1];
-    tile_base = 220.0;
-    //read level
-    FILE *fpi = fopen("level1.txt","r");
-    if (fpi) {
-        nrows=0;
-        char line[100];
-        while (fgets(line, 100, fpi) != NULL) {
-            removeCrLf(line);
-            int slen = strlen(line);
-            ncols = slen;
-            //Log("line: %s\n", line);
-            for (int j=0; j<slen; j++) {
-                arr[nrows][j] = line[j];
-            }
-            ++nrows;
-        }
-        fclose(fpi);
-        //printf("nrows of background data: %i\n", nrows);
-    }
-    for (int i=0; i<nrows; i++) {
-        for (int j=0; j<ncols; j++) {
-            printf("%c", arr[i][j]);
-        }
-        printf("\n");
-    }
-}
-void Level::removeCrLf(char *str) {
-    //remove carriage return and linefeed from a Cstring
-    char *p = str;
-    while (*p) {
-        if (*p == 10 || *p == 13) {
-            *p = '\0';
-            break;
-        }
-        ++p;
-    }
-}
-
-//X Windows variables
-X11_wrapper::~X11_wrapper() {
-    XDestroyWindow(dpy, win);
-    XCloseDisplay(dpy);
-}
-void X11_wrapper::setTitle() {
-    //Set the window title bar.
-    XMapWindow(dpy, win);
-    XStoreName(dpy, win, "Family Chicken Bag");
-}
-void X11_wrapper::setupScreenRes(const int w, const int h) {
-    gl.xres = w;
-    gl.yres = h;
-}
-X11_wrapper::X11_wrapper() {
-    GLint att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None };
-    //GLint att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, None };
-    XSetWindowAttributes swa;
-    setupScreenRes(gl.xres, gl.yres);
-    dpy = XOpenDisplay(NULL);
-    if (dpy == NULL) {
-        printf("\n\tcannot connect to X server\n\n");
-        exit(EXIT_FAILURE);
-    }
-    Window root = DefaultRootWindow(dpy);
-    XVisualInfo *vi = glXChooseVisual(dpy, 0, att);
-    if (vi == NULL) {
-        printf("\n\tno appropriate visual found\n\n");
-        exit(EXIT_FAILURE);
-    } 
-    Colormap cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
-    swa.colormap = cmap;
-    swa.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask |
-        StructureNotifyMask | SubstructureNotifyMask;
-    win = XCreateWindow(dpy, root, 0, 0, gl.xres, gl.yres, 0,
-            vi->depth, InputOutput, vi->visual,
-            CWColormap | CWEventMask, &swa);
-    GLXContext glc = glXCreateContext(dpy, vi, NULL, GL_TRUE);
-    glXMakeCurrent(dpy, win, glc);
-    setTitle();
-}
-void X11_wrapper::reshapeWindow(int width, int height) {
-    //window has been resized.
-    setupScreenRes(width, height);
-    glViewport(0, 0, (GLint)width, (GLint)height);
-    glMatrixMode(GL_PROJECTION); glLoadIdentity();
-    glMatrixMode(GL_MODELVIEW); glLoadIdentity();
-    glOrtho(0, gl.xres, 0, gl.yres, -1, 1);
-    setTitle();
-}
-void X11_wrapper::checkResize(XEvent *e) {
-    //The ConfigureNotify is sent by the
-    //server if the window is resized.
-    if (e->type != ConfigureNotify)
-        return;
-    XConfigureEvent xce = e->xconfigure;
-    if (xce.width != gl.xres || xce.height != gl.yres) {
-        //Window size did change.
-        reshapeWindow(xce.width, xce.height);
-    }
-}
-bool X11_wrapper::getXPending() {
-    return XPending(dpy);
-}
-XEvent X11_wrapper::getXNextEvent() {
-    XEvent e;
-    XNextEvent(dpy, &e);
-    return e;
-}
-void X11_wrapper::swapBuffers() {
-    glXSwapBuffers(dpy, win);
-}
-
-Image::~Image() { delete [] data; }
-Image::Image(const char *fname) {
-    if (fname[0] == '\0')
-        return;
-    //printf("fname **%s**\n", fname);
-    int ppmFlag = 0;
-    char name[40];
-    strcpy(name, fname);
-    int slen = strlen(name);
-    char ppmname[80];
-    if (strncmp(name+(slen-4), ".ppm", 4) == 0)
-        ppmFlag = 1;
-    if (ppmFlag) {
-        strcpy(ppmname, name);
-    } else {
-        name[slen-4] = '\0';
-        //printf("name **%s**\n", name);
-        sprintf(ppmname,"%s.ppm", name);
-        //printf("ppmname **%s**\n", ppmname);
-
-        char ts[100];
-        //system("convert eball.jpg eball.ppm");
-        sprintf(ts, "convert %s %s", fname, ppmname);
-        system(ts);
-    }
-    //sprintf(ts, "%s", name);
-    //printf("read ppm **%s**\n", ppmname); fflush(stdout);
-    FILE *fpi = fopen(ppmname, "r");
-    if (fpi) {
-        char line[200];
-        fgets(line, 200, fpi);
-        fgets(line, 200, fpi);
-        //skip comments and blank lines
-        while (line[0] == '#' || strlen(line) < 2)
-            fgets(line, 200, fpi);
-        sscanf(line, "%i %i", &width, &height);
-        fgets(line, 200, fpi);
-        //get pixel data
-        int n = width * height * 3;			
-        data = new unsigned char[n];			
-        for (int i=0; i<n; i++)
-            data[i] = fgetc(fpi);
-        fclose(fpi);
-    } else {
-        printf("ERROR opening image: %s\n",ppmname);
-        exit(0);
-    }
-    if (!ppmFlag)
-        unlink(ppmname);
-}
-
->>>>>>> cleo
 int main(void)
 {
     srand (time(NULL));
@@ -343,17 +122,19 @@ int main(void)
 
 unsigned char *buildAlphaData(Image *img)
 {
-    //TRANSPARENCY FUNCTION
+    //add 4th component to RGB stream...
+    int i;
     unsigned char *newdata, *ptr;
     unsigned char *data = (unsigned char *)img->data;
-    newdata = (unsigned char *)malloc(img->width * img->height * 4);
+    newdata = (unsigned char *)malloc(img->width * img->height * 4); 
     ptr = newdata;
     unsigned char a,b,c;
     //use the first pixel in the image as the transparent color.
     unsigned char t0 = *(data+0);
     unsigned char t1 = *(data+1);
     unsigned char t2 = *(data+2);
-    for (int i=0; i<img->width * img->height * 3; i+=3) {
+    //cout << "buildAlphaData() clear color is:  (" << (int)t0 << ", " << (int)t1 << ", " << (int)t2 << ")" << endl;
+    for (i=0; i<img->width * img->height * 3; i+=3) {
         a = *(data+0);
         b = *(data+1);
         c = *(data+2);
@@ -366,7 +147,7 @@ unsigned char *buildAlphaData(Image *img)
         //-----------------------------------------------
         ptr += 4;
         data += 3;
-    }
+    }   
     return newdata;
 }
 
@@ -476,7 +257,44 @@ void initOpengl(void)
     glTexImage2D(GL_TEXTURE_2D,0,3,TimageW,TimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[11].data);
     glViewport(0, 0, gl.xres, gl.yres);
 
+<<<<<<< HEAD
+    //End Screen
+    glGenTextures(1, &gl.endTexture);
+    int EimageW = img[12].width; 
+    int EimageH = img[12].height; 
+    glBindTexture(GL_TEXTURE_2D, gl.titleTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D,0,3,EimageW,EimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[12].data);
+    glViewport(0, 0, gl.xres, gl.yres);
+
     //Initialize matrices
+=======
+	//Spike 	
+    glGenTextures(1, &gl.spikeTexture);
+    int SimageW = img[12].width; 
+    int SimageH = img[12].height; 
+    glBindTexture(GL_TEXTURE_2D, gl.spikeTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D,0,3,SimageW,SimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[12].data);
+    glViewport(0, 0, gl.xres, gl.yres);
+	makeTransparent(&gl.spikeTexture, &img[12]);
+
+	    
+	//Death Character 	
+    glGenTextures(1, &gl.deathTexture);
+    int DimageW = img[13].width; 
+    int DimageH = img[13].height; 
+    glBindTexture(GL_TEXTURE_2D, gl.deathTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D,0,3,DimageW,DimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[13].data);
+    glViewport(0, 0, gl.xres, gl.yres);
+	makeTransparent(&gl.deathTexture, &img[13]);
+
+	//Initialize matrices
+>>>>>>> f47d78abbc6fadcafafc75cb898ab3d3b0b17392
     glMatrixMode(GL_PROJECTION); glLoadIdentity();
     glMatrixMode(GL_MODELVIEW); glLoadIdentity();
 
@@ -745,7 +563,7 @@ int checkKeys(XEvent *e)
             gl.delay += 0.005;
             break;
 	case XK_space:
-	    gl.Title ^= 1;
+	    gl.Title = false;
 	    break;
         case XK_Escape:
             return 1;
@@ -795,7 +613,8 @@ void physics(void)
                 gl.camera[0] -= 2.0/lev.tilesize[0] * (0.05 / gl.delay);
                 if (gl.camera[0] < 0.0)
                     gl.camera[0] = 0.0;
-            } else {
+            } 
+				else if (gl.keys[XK_Right]) {
                 gl.box[i][0] -= 1.0 * (0.05 / gl.delay);
                 if (gl.box[i][0] < -10.0)
                     gl.box[i][0] += gl.xres + 10.0;
@@ -808,12 +627,20 @@ void physics(void)
         if (gl.punch){
             extern int showPunch(int);
             countp = showPunch(countp);
-            if (countp >= 14) {
+            if (countp >= 7) {
                 gl.punch ^= 1;
                 countp = 0;
             }
         }
-    if (gl.exp.onoff) {
+
+      extern int physicsChicken();
+		int countc = physicsChicken();
+		if (countc >= 14) {
+			//activation here
+		}
+			
+		
+	  if (gl.exp.onoff) {
         //explosion is happening
         timers.recordTime(&timers.timeCurrent);
         double timeSpan = timers.timeDiff(&gl.exp.time, &timers.timeCurrent);
@@ -870,12 +697,8 @@ void physics(void)
 }
 
 extern int colorFont(std::string);
-<<<<<<< HEAD
-extern void showText(int, int, int, string);	
-=======
-extern void showText(int, int, int, const char*);
+extern void showText(int, int, int, std::string);	
 
->>>>>>> cleo
 void render(void)
 {
     if (gl.Title) {
@@ -883,7 +706,15 @@ void render(void)
 	glClearColor(0.1, 0.1, 0.1, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 	extern void showTitlePic(int x, int y, GLuint txt);
-        showTitlePic(200,200,gl.titleTexture);	
+        showTitlePic(400,300,gl.titleTexture);	
+	return;
+    }
+    if (gl.End) {
+	std::cout << gl.End << std::endl;
+	glClearColor(0.1, 0.1, 0.1, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+	extern void showEndPic(int x, int y, GLuint txt);
+        showEndPic(400,300,gl.endTexture);	
 	return;
     }
 
@@ -1065,6 +896,8 @@ void render(void)
 				enemyHealth(locationX, 170, enemy1.health, 14, enemy1);
     			showText(locationX, 80, colorFont("red"), " Enemy Health");
             }*/
+			
+			createSpike('s', spike1, i, j, tx, ty, dd, offy, offx, col, row);
 			createEnemyHitbox('c', enemy1, i, j, tx, ty, dd, offy, offx, col, row);
             --row;
         }
@@ -1113,12 +946,30 @@ void render(void)
         glTexCoord2f(fx+.125, fy);    glVertex2i(cx-w, cy+h);
         glTexCoord2f(fx,      fy);    glVertex2i(cx+w, cy+h);
         glTexCoord2f(fx,      fy+.5); glVertex2i(cx+w, cy-h);
-    } else {
+		  gl.last_position = 'l';
+    } 
+	 else if (gl.keys[XK_Right]) {
         glTexCoord2f(fx,      fy+.5); glVertex2i(cx-w, cy-h);
         glTexCoord2f(fx,      fy);    glVertex2i(cx-w, cy+h);
         glTexCoord2f(fx+.125, fy);    glVertex2i(cx+w, cy+h);
         glTexCoord2f(fx+.125, fy+.5); glVertex2i(cx+w, cy-h);
+		  gl.last_position = 'r';
     }
+	 else {
+		if (gl.last_position == 'l') {
+        glTexCoord2f(fx+.125, fy+.5); glVertex2i(cx-w, cy-h);
+        glTexCoord2f(fx+.125, fy);    glVertex2i(cx-w, cy+h);
+        glTexCoord2f(fx,      fy);    glVertex2i(cx+w, cy+h);
+        glTexCoord2f(fx,      fy+.5); glVertex2i(cx+w, cy-h);
+		}
+		else {
+        glTexCoord2f(fx,      fy+.5); glVertex2i(cx-w, cy-h);
+        glTexCoord2f(fx,      fy);    glVertex2i(cx-w, cy+h);
+        glTexCoord2f(fx+.125, fy);    glVertex2i(cx+w, cy+h);
+        glTexCoord2f(fx+.125, fy+.5); glVertex2i(cx+w, cy-h);
+		}
+	 }
+	 
     glEnd();
     glPopMatrix();
 
@@ -1131,7 +982,6 @@ void render(void)
     showHealthbar(100 ,500 ,gl.healthbarTexture);
 
     //For Text Color
-
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_ALPHA_TEST);
 
@@ -1143,11 +993,19 @@ void render(void)
     extern void Controls_UI(int, int);
     Controls_UI(620,515);
 
-	//DEBUG for Collision
-	extern void DEBUG(int, int);
-	DEBUG(100,100);
     //arrowKeysPicture(500, 500, gl.keysTexture);
-	
+
+	//Test
+	//showImage(200,200,100,100,gl.spikeTexture);
+	//std::cout << "peterX: " << peter.x;
+	makeTransparent(&gl.deathTexture, &img[13]);
+
+	//Show Enemies 
+	if (enemy1.showImage == true)
+		showImage(enemy1.x, enemy1.y, 200, 200, gl.deathTexture);	
+	if (enemy1.showImage == false)
+		showImage(0,0,0,0,gl.deathTexture);	
+
 	//Collision
 	extern void checkCollision();
 	checkCollision();

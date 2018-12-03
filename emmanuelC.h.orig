@@ -96,9 +96,12 @@ public:
 	GLuint healthTexture;
 	GLuint keysTexture;
 	GLuint titleTexture;
+<<<<<<< HEAD
 	GLuint endTexture;
+=======
 	GLuint spikeTexture;
 	GLuint deathTexture;
+>>>>>>> f47d78abbc6fadcafafc75cb898ab3d3b0b17392
 	~Global();
 	Global();
 };
