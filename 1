@@ -760,7 +760,7 @@ void render(void)
     int yCord = 220;
     extern Ground ground(int, int);
     //ground(xCord, yCord);
-    //Ground ground(xCord, yCord);
+    Ground ground(xCord, yCord);
     //ground.render();
     /*glBegin(GL_QUADS);
     glColor3f(0.2, 0.2, 0.2);
@@ -771,8 +771,6 @@ void render(void)
     glVertex2i(0,         0);
     glEnd();
     */
-
-
     //show boxes as background
     for (int i=0; i<20; i++) {
         glPushMatrix();
