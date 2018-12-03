@@ -78,6 +78,7 @@ void render();
 int locationX;
 Collision A;
 Enemy enemy1;
+Peter peter;
 Spike spike1;
 void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j, 
 						int tx, int ty, Flt dd, Flt offy, Flt offx,
@@ -929,7 +930,7 @@ void render(void)
 
 	//Test
 	//showImage(200,200,100,100,gl.spikeTexture);
-	
+	std::cout << "peterX: " << peter.x;
 	//Collision
 	extern void checkCollision();
 	checkCollision();
