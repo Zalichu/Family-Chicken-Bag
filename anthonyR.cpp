@@ -20,6 +20,7 @@ using namespace std;
 extern Image *img;
 extern unsigned char *buildAlphaData(Image *img);
 extern Collision A;
+extern Peter peter;
 extern Enemy enemy1;
 extern int locationX;
 extern Global gl;
@@ -306,7 +307,8 @@ void DEBUG(int x, int y) //WIP
 
 /*COLLISION FUNCTIONS 
 --------------------------------------------------------------*/
-bool Collision::Within_Range(int range) {
+bool Collision::Within_Range(int range) 
+{
 	if (range > 400 && range < 600) {
 		this->range = range;
 		return true;
@@ -314,12 +316,14 @@ bool Collision::Within_Range(int range) {
 	return false;
 }
 
-bool Collision::Punching(bool flag) {
+bool Collision::Punching(bool flag) 
+{
 	punching = flag;
 	return flag;
 }
 
-int Collision::Damage() {
+int Collision::Damage() 
+{
 	if (restrict == true)	
 		return 20;
 	if (punching == true)
@@ -327,16 +331,31 @@ int Collision::Damage() {
 	return 20;		
 }
 
-void Collision::Check_For_Hit() {
+void Collision::Check_For_Hit() 
+{
 	if (punching) {
 		contact = true;
 		//Damage();
 	}		
 }
 
-//void Peter:CheckForDeath();
-//{
-//};
+void Spike::Within_Range(int x, int y, Peter &peter) 
+{
+	if (x > xHitBoxLEFT && x < xHitBoxRIGHT) {
+		//if (y > yHitBoxBOTTOM && y < yHitBoxTOP) {
+			peter.health = 0;
+			std::cout << " - Peter be dead \n";
+		//}
+	}
+}
+
+bool Peter::Alive() 
+{
+	if (health <= 0) {
+		return false;
+	}
+	return true;
+}
 
 void checkCollision()
 {
@@ -361,7 +380,7 @@ void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j,
 		locationX = (Flt)j*dd+offx;
 		A.Within_Range(locationX);
 				
-		std::cout << locationX;
+		//std::cout << locationX;
 
         glColor3f(75, 0, 130);
         glPushMatrix();
@@ -385,17 +404,18 @@ void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j,
 	}
 }
 
-
 void createSpike(char eLetter, Spike &spikeA, int i, int j, 
 						int tx, int ty, Flt dd, Flt offy, Flt offx,
 						int col, int row) 
 {
 	extern Level lev;
-	
 	if (lev.arr[row][col] == eLetter) {
 		int SlocationX = (Flt)j*dd+offx;
 		int SlocationY = (Flt)i*lev.ftsz[1]+offy;
-		//spike1.Within_Range(locationX);
+		std::cout << "SpikeX: " << SlocationX << " - ";
+		std::cout << "SpikeY: " << SlocationY;
+		 
+		spikeA.Within_Range(SlocationX, SlocationY, peter);
 				
 		showImage(SlocationX, SlocationY, 150, 150, gl.spikeTexture);
 	}
