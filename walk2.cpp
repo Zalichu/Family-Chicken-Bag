@@ -789,6 +789,7 @@ void render(void)
     }
 
     glClear(GL_COLOR_BUFFER_BIT);
+
     float cx = gl.xres/2.0;
     float cy = gl.yres/2.0;
 	gcx = cx;
@@ -1018,25 +1019,12 @@ void render(void)
 	//std::cout << "peterX: " << peter.x;
 	makeTransparent(&gl.deathTexture, &img[14]);
 
-	//Show Enemies 
-	if (enemy1.showImage == true) {
-		showImage(enemy1.x, enemy1.y, 200, 200, gl.deathTexture);
-		showStar((enemy1.x - enemy1xPos++), enemy1.y, 100, 100, gl.ninjaStarTexture);	
-		if ((enemy1.x-enemy1xPos) > peter.xHitBoxLEFT && (enemy1.x-enemy1xPos) < peter.xHitBoxRIGHT) {
-			peter.health = 0;
-			if (!peter.Alive()) {
-				std::cout << "he ded";
-			}
-		}
-		if (enemy1.x-enemy1xPos++ < 100) {
-			enemy1xPos=0;	
-			showStar((enemy1.x - enemy1xPos++), enemy1.y, 100, 100, gl.ninjaStarTexture);	
-		}
-	}
 	if (enemy1.showImage == false) {
 		showImage(0,0,0,0,gl.deathTexture);
 		showStar(0,0,0,0,gl.ninjaStarTexture);
 	}
+	extern void enemyHealth_and_star();
+	enemyHealth_and_star();
 
 	//Collision
 	extern void checkCollision();

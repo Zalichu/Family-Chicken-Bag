@@ -21,6 +21,7 @@ extern Image *img;
 extern unsigned char *buildAlphaData(Image *img);
 extern Collision A;
 extern Peter peter;
+extern int enemy1xPos;
 extern Enemy enemy1;
 extern int locationX;
 extern Global gl;
@@ -378,6 +379,24 @@ void Peter::getPeterPos()
 	peter.y = gcy;
 }
 
+void enemyHealth_and_star()
+{
+	//Show Enemies 
+	if (enemy1.showImage == true) {
+		showImage(enemy1.x, enemy1.y, 200, 200, gl.deathTexture);
+		showStar((enemy1.x - enemy1xPos++), enemy1.y, 100, 100, gl.ninjaStarTexture);	
+		if ((enemy1.x-enemy1xPos) > peter.xHitBoxLEFT && (enemy1.x-enemy1xPos) < peter.xHitBoxRIGHT) {
+			peter.health -= 100;
+			if (!peter.Alive()) {
+				std::cout << "he ded";
+			}
+		}
+		if (enemy1.x-enemy1xPos++ < 100) {
+			enemy1xPos=0;	
+			showStar((enemy1.x - enemy1xPos++), enemy1.y, 100, 100, gl.ninjaStarTexture);	
+		}
+	}
+}
 //void NinjaStar::Hit() 
 //{
 //}
@@ -452,8 +471,7 @@ void createSpike(char eLetter, Spike &spikeA, int i, int j,
 	}
 }
 
-/*
-void createDeath(char eLetter, Death &deathA, int i, int j, 
+/*void createDeath(char eLetter, Death &deathA, int i, int j, 
 						int tx, int ty, Flt dd, Flt offy, Flt offx,
 						int col, int row) 
 {
@@ -468,8 +486,8 @@ void createDeath(char eLetter, Death &deathA, int i, int j,
 		makeTransparent(&gl.deathTexture, &img[13]);
 		showImage(DlocationX, DlocationY, 150, 150, gl.deathTexture);
 	}
-}
-*/
+}*/
+
 /* MISC. FUNCTIONS
 --------------------------------------------------------------*/
 int colorFont(string colorChoice)
