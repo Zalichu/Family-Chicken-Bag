@@ -128,6 +128,7 @@ void showAnthonyPicture(int x, int y, GLuint texid)
     glPopMatrix();
 }
 
+//Old Health - Not currently in use
 void showHealthbar(int x, int y, GLuint texid)
 {
     
@@ -187,9 +188,24 @@ void enemyHealth(int x, int y, int wid, int height, Enemy &enemy1)
 	glPushMatrix();
 	glTranslatef(x,y,0);
 	glBegin(GL_QUADS);	
-        glVertex2i(-wid, -height);
+        glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -height);
+    	glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, height);
+    	glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, height);
+    	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -height);
+	glEnd();
+	glPopMatrix();
+}
+
+void peterHealth(int x, int y, int height, Peter &peter)
+{
+	int wid = peter.health;
+	glColor3ub(73, 230, 99);
+	glPushMatrix();
+	glTranslatef(x,y,0);
+	glBegin(GL_QUADS);	
+    	glVertex2i(-wid, -height);
     	glVertex2i(-wid, height);
-    	glVertex2i(wid, height);
+   		glVertex2i(wid, height);
     	glVertex2i(wid, -height);
 	glEnd();
 	glPopMatrix();
@@ -262,10 +278,10 @@ void Controls_UI(int x, int y) //WIP
 	//showText(int x, int y, int colorText, const char* text)
 	showText(x-52, y-8, colorFont("yellow"), "Q | Kick");
 	showText(x-52, y-28, colorFont("yellow"), "R | Punch");
-	showText(x-52, y-48, colorFont("yellow"), "Space | Jump");
+	showText(x-52, y-48, colorFont("yellow"), "^arrow | Jump");
 }
 
-/*COLLISION FUNCTIONS 220 
+/*COLLISION FUNCTIONS  
 --------------------------------------------------------------*/
 bool Collision::Within_Range(int range) 
 {
@@ -325,6 +341,14 @@ bool Peter::Alive()
 		return false;
 	}
 	return true;
+}
+
+void Peter::getPeterPos()
+{
+	extern float gcy;
+	extern float gcx;
+	peter.x = gcx;
+	peter.y = gcy;
 }
 
 void checkCollision()

@@ -28,7 +28,7 @@ extern Global gl;
 extern Level lev;
 extern X11_wrapper x11;
 
-Image img[14] = {
+Image img[15] = {
     "./images/walk.gif",
     "./images/exp.png",
     "./images/exp44.png",
@@ -42,7 +42,8 @@ Image img[14] = {
     "./images/objects/arrowKeys.png",
     "./images/FCBTitle.png",	    
 	"./images/spike.png",
-	"./images/death.gif"
+	"./images/death.gif",
+	"./images/ninjaStar.png"
 };
 
 Image backgroundImg[2] = {
@@ -89,6 +90,8 @@ void createSpike(char eLetter, Spike &spikeA, int i, int j,
 						int col, int row);
 extern void makeTransparent(GLuint *tex, Image *img);
 extern void showImage(int,int,int,int,GLuint);	
+float gcy;
+float gcx;
 
 int main(void)
 {
@@ -260,6 +263,17 @@ void initOpengl(void)
 	makeTransparent(&gl.spikeTexture, &img[12]);
 
 	    
+	//Ninja Star 	
+    glGenTextures(1, &gl.ninjaStarTexture);
+    int NimageW = img[14].width; 
+    int NimageH = img[14].height; 
+    glBindTexture(GL_TEXTURE_2D, gl.ninjaStarTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D,0,3,NimageW,NimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[14].data);
+    glViewport(0, 0, gl.xres, gl.yres);
+	makeTransparent(&gl.ninjaStarTexture, &img[14]);
+
 	//Death Character 	
     glGenTextures(1, &gl.deathTexture);
     int DimageW = img[13].width; 
@@ -754,6 +768,8 @@ void render(void)
     glClear(GL_COLOR_BUFFER_BIT);
     float cx = gl.xres/2.0;
     float cy = gl.yres/2.0;
+	gcx = cx;
+	gcy = cy;
     //
     //show ground
     glBegin(GL_QUADS);
@@ -943,6 +959,8 @@ void render(void)
     glPopMatrix();
 
     //Show Health
+	//extern void peterHealth(int, int, int, Peter &peter);
+	//peterHealth(100, 500, 80, peter);
     extern void showHealth(int, int, int, GLuint);
     showHealth(100, 500, gl.playerHealth, gl.healthTexture);
 
@@ -956,9 +974,9 @@ void render(void)
 
     //Health Bar Text
     showText(50, gl.yres-166, colorFont("white"), "Health");
-
+	
     //UI Help UI_Display
-    extern void arrowKeysPicture(int, int, GLuint);
+    //extern void arrowKeysPicture(int, int, GLuint);
     extern void Controls_UI(int, int);
     Controls_UI(620,515);
 
@@ -968,7 +986,13 @@ void render(void)
 	//showImage(200,200,100,100,gl.spikeTexture);
 	//std::cout << "peterX: " << peter.x;
 	makeTransparent(&gl.deathTexture, &img[13]);
-
+	
+	//TESTING
+	peter.getPeterPos();
+	std::cout << "PeterX: " << peter.x << std::endl;
+	std::cout << "PeterY: " << peter.y << std::endl;
+	
+	showImage(100,100,100,100,gl.ninjaStarTexture);
 	//Show Enemies 
 	if (enemy1.showImage == true)
 		showImage(enemy1.x, enemy1.y, 200, 200, gl.deathTexture);	

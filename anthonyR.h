@@ -16,17 +16,18 @@ public:
 	int y;
 	int xHitBoxLEFT;
 	int xHitBoxRIGHT;
-	int yHitBoxLEFT;
-	int yHitBoxRIGHT;
+	int yHitBoxBOTTOM;
+	int yHitBoxTOP;
 	Peter() {
-		x = 400;	
+		x = 0;	
 		y = 0;
 		xHitBoxLEFT = 0;
 		xHitBoxRIGHT = 0;
-		yHitBoxLEFT = 0;
-		yHitBoxRIGHT = 0;
-		health = 80;
+		yHitBoxBOTTOM = 0;
+		yHitBoxTOP = 0;
+		health = 100;
 	}
+	void getPeterPos();
 	bool Alive();
 };
 
@@ -103,8 +104,38 @@ public:
 		yHitBoxBOTTOM = 0;
 		yHitBoxTOP = 0;
 	}
-	//bool Spike_Collision();
-	//void Within_Range(int x, int y, Peter &peter);
+};
+
+class NinjaStar {
+public:
+	int xHitBoxLEFT;
+	int xHitBoxRIGHT;
+	int yHitBoxBOTTOM;
+	int yHitBoxTOP;
+	int damage;
+	NinjaStar() 
+	{	
+		xHitBoxLEFT = 0; //Hit boxes will be changing 
+		xHitBoxRIGHT = 0;
+		yHitBoxBOTTOM = 0;
+		yHitBoxTOP = 0;
+		damage = 100;
+	}
 };
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

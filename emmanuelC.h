@@ -97,6 +97,8 @@ public:
 	GLuint titleTexture;
 	GLuint spikeTexture;
 	GLuint deathTexture;
+	GLuint ninjaStarTexture;
+
 	~Global();
 	Global();
 };
