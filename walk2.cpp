@@ -577,7 +577,8 @@ void physics(void)
                 gl.camera[0] -= 2.0/lev.tilesize[0] * (0.05 / gl.delay);
                 if (gl.camera[0] < 0.0)
                     gl.camera[0] = 0.0;
-            } else {
+            } 
+				else if (gl.keys[XK_Right]) {
                 gl.box[i][0] -= 1.0 * (0.05 / gl.delay);
                 if (gl.box[i][0] < -10.0)
                     gl.box[i][0] += gl.xres + 10.0;
@@ -590,7 +591,7 @@ void physics(void)
         if (gl.punch){
             extern int showPunch(int);
             countp = showPunch(countp);
-            if (countp >= 14) {
+            if (countp >= 7) {
                 gl.punch ^= 1;
                 countp = 0;
             }
@@ -893,12 +894,30 @@ void render(void)
         glTexCoord2f(fx+.125, fy);    glVertex2i(cx-w, cy+h);
         glTexCoord2f(fx,      fy);    glVertex2i(cx+w, cy+h);
         glTexCoord2f(fx,      fy+.5); glVertex2i(cx+w, cy-h);
-    } else {
+		  gl.last_position = 'l';
+    } 
+	 else if (gl.keys[XK_Right]) {
         glTexCoord2f(fx,      fy+.5); glVertex2i(cx-w, cy-h);
         glTexCoord2f(fx,      fy);    glVertex2i(cx-w, cy+h);
         glTexCoord2f(fx+.125, fy);    glVertex2i(cx+w, cy+h);
         glTexCoord2f(fx+.125, fy+.5); glVertex2i(cx+w, cy-h);
+		  gl.last_position = 'r';
     }
+	 else {
+		if (gl.last_position == 'l') {
+        glTexCoord2f(fx+.125, fy+.5); glVertex2i(cx-w, cy-h);
+        glTexCoord2f(fx+.125, fy);    glVertex2i(cx-w, cy+h);
+        glTexCoord2f(fx,      fy);    glVertex2i(cx+w, cy+h);
+        glTexCoord2f(fx,      fy+.5); glVertex2i(cx+w, cy-h);
+		}
+		else {
+        glTexCoord2f(fx,      fy+.5); glVertex2i(cx-w, cy-h);
+        glTexCoord2f(fx,      fy);    glVertex2i(cx-w, cy+h);
+        glTexCoord2f(fx+.125, fy);    glVertex2i(cx+w, cy+h);
+        glTexCoord2f(fx+.125, fy+.5); glVertex2i(cx+w, cy-h);
+		}
+	 }
+	 
     glEnd();
     glPopMatrix();
 

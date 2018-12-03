@@ -64,7 +64,7 @@ Global::~Global() {
 }
 Global::Global() {
     playerHealth = 80;
-	Title = true;
+	 Title = true;
     menu = false;
     credits = 0;
     background= false;
@@ -78,6 +78,7 @@ Global::Global() {
     punch=0;
     walkFrame=0;
     walkImage=NULL;
+	 last_position='r';
     MakeVector(ball_pos, 520.0, 0, 0);
     MakeVector(ball_vel, 0, 0, 0);
     delay = 0.1;
@@ -297,6 +298,8 @@ int showPunch(int frame)
     //when time is up, advance the frame.
     timers.recordTime(&timers.timeCurrent);
     double timeSpan = timers.timeDiff(&timers.walkTime, &timers.timeCurrent);
+	 if (gl.walkFrame < 8)
+		  gl.walkFrame = 8;
     if (timeSpan > gl.delay) {
         //advance
         ++gl.walkFrame;
@@ -306,12 +309,12 @@ int showPunch(int frame)
         timers.recordTime(&timers.walkTime);
     }
     for (int i=0; i<20; i++) {
-        gl.box[i][0] -= 1.0 * (0.05 / gl.delay);
+        /*gl.box[i][0] -= 1.0 * (0.05 / gl.delay);
         if (gl.box[i][0] < -10.0)
             gl.box[i][0] += gl.xres + 10.0;
         gl.camera[0] += 2.0/lev.tilesize[0] * (0.05 / gl.delay);
         if (gl.camera[0] < 0.0)
-            gl.camera[0] = 0.0;
+            gl.camera[0] = 0.0; */
     }
     if (gl.exp.onoff) {
         gl.exp.pos[0] -= 2.0 * (0.05 / gl.delay);
