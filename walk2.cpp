@@ -28,7 +28,7 @@ extern Global gl;
 extern Level lev;
 extern X11_wrapper x11;
 
-Image img[13] = {
+Image img[14] = {
     "./images/walk.gif",
     "./images/exp.png",
     "./images/exp44.png",
@@ -41,7 +41,8 @@ Image img[13] = {
     "./images/objects/health.png",
     "./images/objects/arrowKeys.png",
     "./images/FCBTitle.png",	    
-	"./images/spike.png"
+	"./images/spike.png",
+	"./images/death.gif"
 };
 
 Image backgroundImg[2] = {
@@ -257,8 +258,20 @@ void initOpengl(void)
     glTexImage2D(GL_TEXTURE_2D,0,3,SimageW,SimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[12].data);
     glViewport(0, 0, gl.xres, gl.yres);
 	makeTransparent(&gl.spikeTexture, &img[12]);
+
 	    
-//Initialize matrices
+	//Death Character 	
+    glGenTextures(1, &gl.deathTexture);
+    int DimageW = img[13].width; 
+    int DimageH = img[13].height; 
+    glBindTexture(GL_TEXTURE_2D, gl.deathTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D,0,3,DimageW,DimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[13].data);
+    glViewport(0, 0, gl.xres, gl.yres);
+	makeTransparent(&gl.deathTexture, &img[13]);
+
+	//Initialize matrices
     glMatrixMode(GL_PROJECTION); glLoadIdentity();
     glMatrixMode(GL_MODELVIEW); glLoadIdentity();
 
@@ -930,7 +943,6 @@ void render(void)
     showHealthbar(100 ,500 ,gl.healthbarTexture);
 
     //For Text Color
-
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_ALPHA_TEST);
 
@@ -942,14 +954,18 @@ void render(void)
     extern void Controls_UI(int, int);
     Controls_UI(620,515);
 
-	//DEBUG for Collision
-	extern void DEBUG(int, int);
-	DEBUG(100,100);
     //arrowKeysPicture(500, 500, gl.keysTexture);
 
 	//Test
 	//showImage(200,200,100,100,gl.spikeTexture);
 	//std::cout << "peterX: " << peter.x;
+	makeTransparent(&gl.deathTexture, &img[13]);
+
+	//Show Enemies 
+	if (enemy1.showImage == true)
+		showImage(enemy1.x, enemy1.y, 200, 200, gl.deathTexture);	
+	if (enemy1.showImage == false)
+		showImage(0,0,0,0,gl.deathTexture);	
 
 	//Collision
 	extern void checkCollision();

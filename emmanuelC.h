@@ -65,9 +65,10 @@ public:
 	int xres, yres;
 	int movie, movieStep;
 	int walk;
-   int punch;
+    int punch;
 	int walkFrame;
 	double delay;
+	bool showDeath; //added
 	bool credits; //Added
 	bool menu; // Added
 	bool Title;
@@ -93,6 +94,7 @@ public:
 	GLuint keysTexture;
 	GLuint titleTexture;
 	GLuint spikeTexture;
+	GLuint deathTexture;
 	~Global();
 	Global();
 };

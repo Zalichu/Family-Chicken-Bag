@@ -265,53 +265,23 @@ void Controls_UI(int x, int y) //WIP
 	showText(x-52, y-48, colorFont("yellow"), "Space | Jump");
 }
 
-void DEBUG(int x, int y) //WIP 
-{	
-	int boxSize = 70;
-	int borderSize = 5;
-	
-	//Red Border
- 	glColor3ub(204, 0, 0);
-    int wid = boxSize + borderSize;
-	int height = boxSize + borderSize;
-    glPushMatrix();
-    glTranslatef(x, y, 0);
-    glBegin(GL_QUADS);
-    	glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -height);
-    	glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, height);
-    	glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, height);
-    	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -height);
-    glEnd();
-    glPopMatrix();
-	//Light Grey Box 
- 	glColor3ub(160, 160, 160);
-    wid -= borderSize;
-	height -= borderSize;
-    glPushMatrix();
-    glTranslatef(x, y, 0);
-    glBegin(GL_QUADS);
-    	glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -height);
-    	glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, height);
-    	glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, height);
-    	glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -height);
-    glEnd();
-    glPopMatrix();
-	showText(x-52, y+5, colorFont("red"), "DEBUGGING");	
-	showText(x-52, y, colorFont("red"), "==========");
-	showText(x-52, y-65, colorFont("yellow"), "range: ");
-	//showText(int x, int y, int colorText, const char* text)
-	showText(x-52, y-13, colorFont("yellow"), "punching: ");
-	showText(x-52, y-33, colorFont("yellow"), "damage done: ");
-	showText(x-52, y-49, colorFont("yellow"), "hit detected: ");
-}
-
-/*COLLISION FUNCTIONS 
+/*COLLISION FUNCTIONS 220 
 --------------------------------------------------------------*/
 bool Collision::Within_Range(int range) 
 {
 	if (range > 400 && range < 600) {
 		this->range = range;
-		return true;
+		if (gl.last_position == 'l') 
+			return false;
+		if (gl.last_position == 'r')
+			return true;
+	}
+	if (range > 220 && range < 400) {
+		this->range = range;
+		if (gl.last_position == 'r')
+			return false;
+		if (gl.last_position == 'l')
+			return true;
 	}
 	return false;
 }
@@ -378,9 +348,12 @@ void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j,
 	
 	if (lev.arr[row][col] == eLetter) {
 		locationX = (Flt)j*dd+offx;
+		int elocationY = (Flt)i*lev.ftsz[1]+offy;
 		A.Within_Range(locationX);
 				
-		//std::cout << locationX;
+		enemyA.x = locationX;
+		enemyA.y = elocationY + 80;
+		std::cout << locationX;
 
         glColor3f(75, 0, 130);
         glPushMatrix();
@@ -392,14 +365,17 @@ void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j,
             glVertex2i(tx,  0);
         glEnd();
         glPopMatrix();
-		if (enemyA.health < 0) 
+		//showImage(locationX, elocationY+70, 200, 200, gl.deathTexture);
+		if (enemyA.health < 0) {
 				enemyA.health = 0;
+		}
 			enemyHealth(locationX, 170, enemyA.health, 14, enemyA);
 		if (enemyA.health != 0)
     		showText(locationX, 80, colorFont("red"), " Enemy Health");
 		if (enemyA.health <= 0) {
 			if (++enemy1Count <= 1)
 				playerScore++;
+			enemyA.showImage = false; 
 		}
 	}
 }
@@ -412,8 +388,8 @@ void createSpike(char eLetter, Spike &spikeA, int i, int j,
 	if (lev.arr[row][col] == eLetter) {
 		int SlocationX = (Flt)j*dd+offx;
 		int SlocationY = (Flt)i*lev.ftsz[1]+offy;
-		std::cout << "SpikeX: " << SlocationX << " - ";
-		std::cout << "SpikeY: " << SlocationY;
+		//std::cout << "SpikeX: " << SlocationX << " - ";
+		//std::cout << "SpikeY: " << SlocationY;
 		 
 		spikeA.Within_Range(SlocationX, SlocationY, peter);
 				
@@ -421,6 +397,24 @@ void createSpike(char eLetter, Spike &spikeA, int i, int j,
 	}
 }
 
+/*
+void createDeath(char eLetter, Death &deathA, int i, int j, 
+						int tx, int ty, Flt dd, Flt offy, Flt offx,
+						int col, int row) 
+{
+	extern Level lev;
+	if (lev.arr[row][col] == eLetter) {
+		int DlocationX = (Flt)j*dd+offx;
+		int DlocationY = (Flt)i*lev.ftsz[1]+offy;
+		std::cout << "DeathX: " << DlocationX << " - ";
+		std::cout << "DeathY: " << DlocationY;
+		 
+		//spikeA.Within_Range(DlocationX, DlocationY, peter);
+		makeTransparent(&gl.deathTexture, &img[13]);
+		showImage(DlocationX, DlocationY, 150, 150, gl.deathTexture);
+	}
+}
+*/
 /* MISC. FUNCTIONS
 --------------------------------------------------------------*/
 int colorFont(string colorChoice)

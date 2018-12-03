@@ -61,7 +61,16 @@ public:
 class Enemy {
 public:
 	int health;
-	Enemy() { health = 100; }
+	int x;
+	int y;
+	bool showImage;
+	Enemy() 
+	{
+		x = 0;
+		y = 0; 
+		health = 100; 
+		showImage = true;
+	}
 };
 
 class Spike {
@@ -79,6 +88,23 @@ public:
 	}
 	bool Spike_Collision();
 	void Within_Range(int x, int y, Peter &peter);
+};
+
+class Death {
+public:
+	int xHitBoxLEFT;
+	int xHitBoxRIGHT;
+	int yHitBoxBOTTOM;
+	int yHitBoxTOP;
+	Death()
+	{
+		xHitBoxLEFT = 290; //Fixed Locations for every Spike
+		xHitBoxRIGHT = 520;
+		yHitBoxBOTTOM = 0;
+		yHitBoxTOP = 0;
+	}
+	//bool Spike_Collision();
+	//void Within_Range(int x, int y, Peter &peter);
 };
 #endif
 
