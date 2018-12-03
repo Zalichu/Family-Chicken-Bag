@@ -308,14 +308,14 @@ int showPunch(int frame)
             gl.walkFrame -= 14;
         timers.recordTime(&timers.walkTime);
     }
-    for (int i=0; i<20; i++) {
-        /*gl.box[i][0] -= 1.0 * (0.05 / gl.delay);
+    /*for (int i=0; i<20; i++) {
+        gl.box[i][0] -= 1.0 * (0.05 / gl.delay);
         if (gl.box[i][0] < -10.0)
             gl.box[i][0] += gl.xres + 10.0;
         gl.camera[0] += 2.0/lev.tilesize[0] * (0.05 / gl.delay);
         if (gl.camera[0] < 0.0)
-            gl.camera[0] = 0.0; */
-    }
+            gl.camera[0] = 0.0;
+    }*/
     if (gl.exp.onoff) {
         gl.exp.pos[0] -= 2.0 * (0.05 / gl.delay);
     }
@@ -323,4 +323,36 @@ int showPunch(int frame)
         gl.exp44.pos[0] -= 2.0 * (0.05 / gl.delay);
     }
     return frame;
+}
+
+int physicsChicken()
+{
+    //man is walking...
+    //when time is up, advance the frame.
+    timers.recordTime(&timers.timeCurrent);
+    double timeSpan = timers.timeDiff(&timers.walkTime, &timers.timeCurrent);
+	 if (gl.chickenFrame < 8)
+		  gl.chickenFrame = 8;
+    if (timeSpan > gl.delay) {
+        //advance
+        ++gl.chickenFrame;
+        if (gl.chickenFrame >= 14)
+            gl.chickenFrame -= 14;
+        timers.recordTime(&timers.walkTime);
+    }
+    /*for (int i=0; i<20; i++) {
+        gl.box[i][0] -= 1.0 * (0.05 / gl.delay);
+        if (gl.box[i][0] < -10.0)
+            gl.box[i][0] += gl.xres + 10.0;
+        gl.camera[0] += 2.0/lev.tilesize[0] * (0.05 / gl.delay);
+        if (gl.camera[0] < 0.0)
+            gl.camera[0] = 0.0;
+    }*/
+    if (gl.exp.onoff) {
+        gl.exp.pos[0] -= 2.0 * (0.05 / gl.delay);
+    }
+    if (gl.exp44.onoff) {
+        gl.exp44.pos[0] -= 2.0 * (0.05 / gl.delay);
+    }
+    return gl.chickenFrame;
 }
