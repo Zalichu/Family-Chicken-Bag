@@ -386,7 +386,7 @@ void enemyHealth_and_star()
 		showImage(enemy1.x, enemy1.y, 200, 200, gl.deathTexture);
 		showStar((enemy1.x - enemy1xPos++), enemy1.y, 100, 100, gl.ninjaStarTexture);	
 		if ((enemy1.x-enemy1xPos) > peter.xHitBoxLEFT && (enemy1.x-enemy1xPos) < peter.xHitBoxRIGHT) {
-			peter.health -= 100;
+			peter.health -= 1;
 			if (!peter.Alive()) {
 				std::cout << "he ded";
 			}

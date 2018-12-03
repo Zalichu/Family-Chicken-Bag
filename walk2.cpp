@@ -28,7 +28,7 @@ extern Global gl;
 extern Level lev;
 extern X11_wrapper x11;
 
-Image img[16] = {
+Image img[17] = {
     "./images/walk.gif",
     "./images/exp.png",
     "./images/exp44.png",
@@ -44,7 +44,8 @@ Image img[16] = {
     "./images/FCBEnd.png",	    
 	"./images/spike.png",
 	"./images/death.gif",
-	"./images/ninjaStar.png"
+	"./images/ninjaStar.png",
+	"./images/health2.png"
 };
 
 Image backgroundImg[2] = {
@@ -299,7 +300,17 @@ void initOpengl(void)
     glTexImage2D(GL_TEXTURE_2D,0,3,DimageW,DimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[14].data);
     glViewport(0, 0, gl.xres, gl.yres);
 	makeTransparent(&gl.deathTexture, &img[14]);
-
+	
+	//Health v.2	
+    glGenTextures(1, &gl.health2Texture);
+    int H2imageW = img[16].width; 
+    int H2imageH = img[16].height; 
+    glBindTexture(GL_TEXTURE_2D, gl.health2Texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D,0,3,H2imageW,H2imageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[16].data);
+    glViewport(0, 0, gl.xres, gl.yres);
+	
 	//Initialize matrices
     glMatrixMode(GL_PROJECTION); glLoadIdentity();
     glMatrixMode(GL_MODELVIEW); glLoadIdentity();
@@ -993,12 +1004,12 @@ void render(void)
     //Show Health
 	//extern void peterHealth(int, int, int, Peter &peter);
 	//peterHealth(100, 500, 80, peter);
-    extern void showHealth(int, int, int, GLuint);
-    showHealth(100, 500, gl.playerHealth, gl.healthTexture);
-
+    //extern void showHealth(int, int, int, GLuint);
+    //showHealth(100, 500, gl.playerHealth, gl.healthTexture);
+	showImage(100,520,peter.health,20,gl.health2Texture);
     //Show Healthbar UI	
-    extern void showHealthbar(int, int, GLuint);
-    showHealthbar(100 ,500 ,gl.healthbarTexture);
+    //extern void showHealthbar(int, int, GLuint);
+    //showHealthbar(100 ,500 ,gl.healthbarTexture);
 
     //For Text Color
     glBindTexture(GL_TEXTURE_2D, 0);
