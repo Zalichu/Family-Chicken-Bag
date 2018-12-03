@@ -77,15 +77,15 @@ void intializeTexture(int index, GLuint texid) //Every Image needs
     glViewport(0, 0, gl.xres, gl.yres);	
 }
 
-void makeTransparent(GLuint *tex, Image img)
+void makeTransparent(GLuint *tex, Image *img)
 {
     glGenTextures(1, tex);
-    int w = img.width;
-    int h = img.height;
+    int w = img->width;
+    int h = img->height;
     glBindTexture(GL_TEXTURE_2D, *tex);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST); 
-    unsigned char *xData = buildAlphaData(&img);
+    unsigned char *xData = buildAlphaData(img);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
         GL_RGBA, GL_UNSIGNED_BYTE, xData);
     free(xData);
@@ -304,7 +304,7 @@ void DEBUG(int x, int y) //WIP
 	showText(x-52, y-49, colorFont("yellow"), "hit detected: ");
 }
 
-/*LOGIC FUNCTIONS 
+/*COLLISION FUNCTIONS 
 --------------------------------------------------------------*/
 bool Collision::Within_Range(int range) {
 	if (range > 400 && range < 600) {
@@ -333,6 +333,10 @@ void Collision::Check_For_Hit() {
 		//Damage();
 	}		
 }
+
+//void Peter:CheckForDeath();
+//{
+//};
 
 void checkCollision()
 {
@@ -378,6 +382,22 @@ void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j,
 			if (++enemy1Count <= 1)
 				playerScore++;
 		}
+	}
+}
+
+
+void createSpike(char eLetter, Spike &spikeA, int i, int j, 
+						int tx, int ty, Flt dd, Flt offy, Flt offx,
+						int col, int row) 
+{
+	extern Level lev;
+	
+	if (lev.arr[row][col] == eLetter) {
+		int SlocationX = (Flt)j*dd+offx;
+		int SlocationY = (Flt)i*lev.ftsz[1]+offy;
+		//spike1.Within_Range(locationX);
+				
+		showImage(SlocationX, SlocationY, 150, 150, gl.spikeTexture);
 	}
 }
 

@@ -28,7 +28,7 @@ extern Global gl;
 extern Level lev;
 extern X11_wrapper x11;
 
-Image img[12] = {
+Image img[13] = {
     "./images/walk.gif",
     "./images/exp.png",
     "./images/exp44.png",
@@ -40,7 +40,8 @@ Image img[12] = {
     "./images/objects/HealthBarUI.png",
     "./images/objects/health.png",
     "./images/objects/arrowKeys.png",
-    "./images/FCBTitle.png"	    
+    "./images/FCBTitle.png",	    
+	"./images/spike.png"
 };
 
 Image backgroundImg[2] = {
@@ -77,9 +78,16 @@ void render();
 int locationX;
 Collision A;
 Enemy enemy1;
+Spike spike1;
 void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j, 
 						int tx, int ty, Flt dd, Flt offy, Flt offx,
-						int col, int row); 
+						int col, int row);
+void createSpike(char eLetter, Spike &spikeA, int i, int j, 
+						int tx, int ty, Flt dd, Flt offy, Flt offx,
+						int col, int row);
+extern void makeTransparent(GLuint *tex, Image *img);
+extern void showImage(int,int,int,int,GLuint);	
+
 int main(void)
 {
     srand (time(NULL));
@@ -238,7 +246,18 @@ void initOpengl(void)
     glTexImage2D(GL_TEXTURE_2D,0,3,TimageW,TimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[11].data);
     glViewport(0, 0, gl.xres, gl.yres);
 
-    //Initialize matrices
+	//Spike 	
+    glGenTextures(1, &gl.spikeTexture);
+    int SimageW = img[12].width; 
+    int SimageH = img[12].height; 
+    glBindTexture(GL_TEXTURE_2D, gl.spikeTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D,0,3,SimageW,SimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[12].data);
+    glViewport(0, 0, gl.xres, gl.yres);
+	makeTransparent(&gl.spikeTexture, &img[12]);
+	    
+//Initialize matrices
     glMatrixMode(GL_PROJECTION); glLoadIdentity();
     glMatrixMode(GL_MODELVIEW); glLoadIdentity();
 
@@ -823,6 +842,8 @@ void render(void)
 				enemyHealth(locationX, 170, enemy1.health, 14, enemy1);
     			showText(locationX, 80, colorFont("red"), " Enemy Health");
             }*/
+			
+			createSpike('s', spike1, i, j, tx, ty, dd, offy, offx, col, row);
 			createEnemyHitbox('c', enemy1, i, j, tx, ty, dd, offy, offx, col, row);
             --row;
         }
@@ -905,6 +926,9 @@ void render(void)
 	extern void DEBUG(int, int);
 	DEBUG(100,100);
     //arrowKeysPicture(500, 500, gl.keysTexture);
+
+	//Test
+	//showImage(200,200,100,100,gl.spikeTexture);
 	
 	//Collision
 	extern void checkCollision();

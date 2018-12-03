@@ -91,6 +91,7 @@ public:
 	GLuint healthTexture;
 	GLuint keysTexture;
 	GLuint titleTexture;
+	GLuint spikeTexture;
 	~Global();
 	Global();
 };
