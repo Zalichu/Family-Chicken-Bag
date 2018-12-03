@@ -70,6 +70,7 @@ public:
 	double delay;
 	bool credits; //Added
 	bool menu; // Added
+	bool End; //Added
 	bool Title;
 	bool background; // fixed background
 	Image *walkImage;
@@ -91,6 +92,7 @@ public:
 	GLuint healthTexture;
 	GLuint keysTexture;
 	GLuint titleTexture;
+	GLuint endTexture;
 	~Global();
 	Global();
 };

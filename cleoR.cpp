@@ -9,16 +9,15 @@
 
 using namespace std;
 
-void showCleoName(int x, int y) 
-{
+void showCleoName(int x, int y) {
     Rect r;
     r.bot = y;
     r.left = x;
     r.center = 0;
     ggprint8b(&r, 16, 0x00ff0000, "Cleophas Reaves III");
 }
-void showCleoPicture(int x, int y, GLuint texid)
-{
+
+void showCleoPicture(int x, int y, GLuint texid) {
     /*
     static float angle = 0.0f;
     float fx = (float)x;
@@ -42,9 +41,7 @@ void showCleoPicture(int x, int y, GLuint texid)
        glPopMatrix();
 }
 
-
-void showTitlePic(int x, int y, GLuint texid)
-{
+void showTitlePic(int x, int y, GLuint texid) {
        glColor3ub(255, 255, 255);
        int wid=400;
        int hgt=300;
@@ -58,4 +55,22 @@ void showTitlePic(int x, int y, GLuint texid)
             glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -hgt);
        glEnd();
        glPopMatrix();
+}
+
+void gameOver(int x, int y, GLuint texid) {
+	if (playerHealth <= 0) {
+		glColor3ub(255, 255, 255);
+		int wid=400;
+		int hgt=300;
+		glPushMatrix();
+		glTranslatef(x, y, 0);
+		glBindTexture(GL_TEXTURE_2D, texid);
+		glBegin(GL_QUADS);
+			glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -hgt);
+			glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, hgt);
+			glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, hgt);
+			glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -hgt);
+		glEnd();
+		glPopMatrix();
+	}
 }

@@ -64,30 +64,31 @@ Global::~Global() {
 }
 Global::Global() {
     playerHealth = 80;
-	Title = true;
+    Title = true;
+    End = false;
     menu = false;
     credits = 0;
     background= false;
     logOpen();
     camera[0] = camera[1] = 0.0;
-    movie=0;
-    movieStep=2;
-    xres=800;
-    yres=600;
-    walk=0;
-    punch=0;
-    walkFrame=0;
-    walkImage=NULL;
+    movie = 0;
+    movieStep = 2;
+    xres = 800;
+    yres = 600;
+    walk = 0;
+    punch = 0;
+    walkFrame = 0;
+    walkImage = NULL;
     MakeVector(ball_pos, 520.0, 0, 0);
     MakeVector(ball_vel, 0, 0, 0);
     delay = 0.1;
-    exp.onoff=0;
-    exp.frame=0;
-    exp.image=NULL;
+    exp.onoff = 0;
+    exp.frame = 0;
+    exp.image = NULL;
     exp.delay = 0.02;
-    exp44.onoff=0;
-    exp44.frame=0;
-    exp44.image=NULL;
+    exp44.onoff = 0;
+    exp44.frame = 0;
+    exp44.image = NULL;
     exp44.delay = 0.022;
     for (int i=0; i<20; i++) {
         box[i][0] = rnd() * xres;

@@ -5,7 +5,7 @@
     multiple sprite-sheet animations
     a level tiling system
     parallax scrolling of backgrounds
-    */
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,7 +28,7 @@ extern Global gl;
 extern Level lev;
 extern X11_wrapper x11;
 
-Image img[12] = {
+Image img[13] = {
     "./images/walk.gif",
     "./images/exp.png",
     "./images/exp44.png",
@@ -40,7 +40,8 @@ Image img[12] = {
     "./images/objects/HealthBarUI.png",
     "./images/objects/health.png",
     "./images/objects/arrowKeys.png",
-    "./images/FCBTitle.png"	    
+    "./images/FCBTitle.png",
+    "./images/FCBEnd.png",	    
 };
 
 Image backgroundImg[2] = {
@@ -234,6 +235,16 @@ void initOpengl(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D,0,3,TimageW,TimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[11].data);
+    glViewport(0, 0, gl.xres, gl.yres);
+
+    //End Screen
+    glGenTextures(1, &gl.endTexture);
+    int EimageW = img[12].width; 
+    int EimageH = img[12].height; 
+    glBindTexture(GL_TEXTURE_2D, gl.titleTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D,0,3,EimageW,EimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[12].data);
     glViewport(0, 0, gl.xres, gl.yres);
 
     //Initialize matrices
@@ -640,6 +651,14 @@ void render(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 	extern void showTitlePic(int x, int y, GLuint txt);
         showTitlePic(400,300,gl.titleTexture);	
+	return;
+    }
+    if (gl.End) {
+	std::cout << gl.End << std::endl;
+	glClearColor(0.1, 0.1, 0.1, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+	extern void showEndPic(int x, int y, GLuint txt);
+        showEndPic(400,300,gl.endTexture);	
 	return;
     }
 
