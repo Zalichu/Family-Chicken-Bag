@@ -109,6 +109,33 @@ void showImage(int x, int y, int width, int height, GLuint texid)
     glBindTexture(GL_TEXTURE_2D, 0); 
     glPopMatrix();
 }
+			
+void showStar(int x, int y, int wid, int height, GLuint texid)
+{
+	static float angle = 0.0f;
+	static float angle2 = 0.0f;
+	static float fx = 0.0f;
+	angle += 0.1;
+	fx = sin(angle);
+	//fx += sin(angle) * 10.0f;
+	angle += 0.2f;	
+        glColor3ub(255, 255, 255);
+        glPushMatrix();
+        glTranslatef(x + (int)(fx*20.0), y, 0);
+	glRotatef(angle2, 0.0f, 0.0f, 1.0f);
+	angle2 += 50;
+        glBindTexture(GL_TEXTURE_2D, texid);
+		glEnable(GL_ALPHA_TEST);
+		glAlphaFunc(GL_GREATER, 0.0f);
+        glBegin(GL_QUADS);
+                glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid/2, -height/2);
+                glTexCoord2f(1.0f, 1.0f); glVertex2i(wid/2, -height/2);
+                glTexCoord2f(1.0f, 0.0f); glVertex2i(wid/2, height/2);
+                glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid/2, height/2);
+        glEnd();
+		glBindTexture(GL_TEXTURE_2D,0);
+        glPopMatrix();	
+}
 
 //Note: Graphic functions down here are before I knew how header files
 // worked. It's very inefficient.
@@ -350,6 +377,10 @@ void Peter::getPeterPos()
 	peter.x = gcx;
 	peter.y = gcy;
 }
+
+//void NinjaStar::Hit() 
+//{
+//}
 
 void checkCollision()
 {

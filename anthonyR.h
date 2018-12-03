@@ -21,8 +21,8 @@ public:
 	Peter() {
 		x = 0;	
 		y = 0;
-		xHitBoxLEFT = 0;
-		xHitBoxRIGHT = 0;
+		xHitBoxLEFT = 300;
+		xHitBoxRIGHT = 500;
 		yHitBoxBOTTOM = 0;
 		yHitBoxTOP = 0;
 		health = 100;
