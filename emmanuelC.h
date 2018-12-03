@@ -76,6 +76,8 @@ public:
 	char last_position;
 	Image *walkImage;
 	GLuint walkTexture;
+	GLuint chicken;
+	int chickenFrame;
 	Vec box[20];
 	Sprite exp;
 	Sprite exp44;

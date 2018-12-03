@@ -609,7 +609,15 @@ void physics(void)
                 countp = 0;
             }
         }
-    if (gl.exp.onoff) {
+
+      extern int physicsChicken();
+		int countc = physicsChicken();
+		if (countc >= 14) {
+			//activation here
+		}
+			
+		
+	  if (gl.exp.onoff) {
         //explosion is happening
         timers.recordTime(&timers.timeCurrent);
         double timeSpan = timers.timeDiff(&gl.exp.time, &timers.timeCurrent);
