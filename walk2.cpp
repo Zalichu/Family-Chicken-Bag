@@ -5,7 +5,7 @@
     multiple sprite-sheet animations
     a level tiling system
     parallax scrolling of backgrounds
-    */
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,7 +28,7 @@ extern Global gl;
 extern Level lev;
 extern X11_wrapper x11;
 
-Image img[15] = {
+Image img[16] = {
     "./images/walk.gif",
     "./images/exp.png",
     "./images/exp44.png",
@@ -40,7 +40,8 @@ Image img[15] = {
     "./images/objects/HealthBarUI.png",
     "./images/objects/health.png",
     "./images/objects/arrowKeys.png",
-    "./images/FCBTitle.png",	    
+    "./images/FCBTitle.png",
+    "./images/FCBEnd.png",	    
 	"./images/spike.png",
 	"./images/death.gif",
 	"./images/ninjaStar.png"
@@ -253,39 +254,51 @@ void initOpengl(void)
     glTexImage2D(GL_TEXTURE_2D,0,3,TimageW,TimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[11].data);
     glViewport(0, 0, gl.xres, gl.yres);
 
+    //End Screen
+    glGenTextures(1, &gl.endTexture);
+    int EimageW = img[12].width; 
+    int EimageH = img[12].height; 
+    glBindTexture(GL_TEXTURE_2D, gl.endTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D,0,3,EimageW,EimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[12].data);
+    glViewport(0, 0, gl.xres, gl.yres);
+
+    //Initialize matrices
+
 	//Spike 	
     glGenTextures(1, &gl.spikeTexture);
-    int SimageW = img[12].width; 
-    int SimageH = img[12].height; 
+    int SimageW = img[13].width; 
+    int SimageH = img[13].height; 
     glBindTexture(GL_TEXTURE_2D, gl.spikeTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D,0,3,SimageW,SimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[12].data);
+    glTexImage2D(GL_TEXTURE_2D,0,3,SimageW,SimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[13].data);
     glViewport(0, 0, gl.xres, gl.yres);
-	makeTransparent(&gl.spikeTexture, &img[12]);
+	makeTransparent(&gl.spikeTexture, &img[13]);
 
 	    
 	//Ninja Star 	
     glGenTextures(1, &gl.ninjaStarTexture);
-    int NimageW = img[14].width; 
-    int NimageH = img[14].height; 
+    int NimageW = img[15].width; 
+    int NimageH = img[15].height; 
     glBindTexture(GL_TEXTURE_2D, gl.ninjaStarTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D,0,3,NimageW,NimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[14].data);
+    glTexImage2D(GL_TEXTURE_2D,0,3,NimageW,NimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[15].data);
     glViewport(0, 0, gl.xres, gl.yres);
-	makeTransparent(&gl.ninjaStarTexture, &img[14]);
+	makeTransparent(&gl.ninjaStarTexture, &img[15]);
 
 	//Death Character 	
     glGenTextures(1, &gl.deathTexture);
-    int DimageW = img[13].width; 
-    int DimageH = img[13].height; 
+    int DimageW = img[14].width; 
+    int DimageH = img[14].height; 
     glBindTexture(GL_TEXTURE_2D, gl.deathTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D,0,3,DimageW,DimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[13].data);
+    glTexImage2D(GL_TEXTURE_2D,0,3,DimageW,DimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[14].data);
     glViewport(0, 0, gl.xres, gl.yres);
-	makeTransparent(&gl.deathTexture, &img[13]);
+	makeTransparent(&gl.deathTexture, &img[14]);
 
 	//Initialize matrices
     glMatrixMode(GL_PROJECTION); glLoadIdentity();
@@ -702,6 +715,14 @@ void render(void)
         showTitlePic(400,300,gl.titleTexture);	
 	return;
     }
+    if (peter.health <= 0) {
+   	//std::cout << gl.End << std::endl;
+    	glClearColor(0.1, 0.1, 0.1, 1.0);
+    	glClear(GL_COLOR_BUFFER_BIT);
+	extern void showEndPic(int x, int y, GLuint txt);
+        showEndPic(400,300,gl.endTexture);	
+    	return;
+    }
 
     //Clear the screen
     glClearColor(0.1, 0.1, 0.1, 1.0);
@@ -995,13 +1016,8 @@ void render(void)
 	//Test
 	//showImage(200,200,100,100,gl.spikeTexture);
 	//std::cout << "peterX: " << peter.x;
-	makeTransparent(&gl.deathTexture, &img[13]);
-	
-	//TESTING
-	peter.getPeterPos();
-	std::cout << "PeterX: " << peter.x << std::endl;
-	std::cout << "PeterY: " << peter.y << std::endl;
-	
+	makeTransparent(&gl.deathTexture, &img[14]);
+
 	//Show Enemies 
 	if (enemy1.showImage == true) {
 		showImage(enemy1.x, enemy1.y, 200, 200, gl.deathTexture);
