@@ -930,7 +930,8 @@ void render(void)
 
 	//Test
 	//showImage(200,200,100,100,gl.spikeTexture);
-	std::cout << "peterX: " << peter.x;
+	//std::cout << "peterX: " << peter.x;
+
 	//Collision
 	extern void checkCollision();
 	checkCollision();
