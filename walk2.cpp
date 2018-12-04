@@ -28,7 +28,7 @@ extern Global gl;
 extern Level lev;
 extern X11_wrapper x11;
 
-Image img[20] = {
+Image img[21] = {
     "./images/walk.gif",
     "./images/exp.png",
     "./images/exp44.png",
@@ -48,7 +48,8 @@ Image img[20] = {
 	"./images/health2.png",
 	"./images/background/ground.png",
 	"./images/objects/tile.png",
-	"./images/objects/heart.png"
+	"./images/objects/heart.png",
+	"./images/background/tree.png"
 };
 
 Image backgroundImg[3] = {
@@ -332,18 +333,22 @@ void initOpengl(void)
     glViewport(0, 0, gl.xres, gl.yres);
 
 
-	//backset
+	// backset
 	extern void setBackset(Image);
 	setBackset(backgroundImg[2]);
 
-	//tile set
+	// tile set
 	extern void setTile(Image); 
 	setTile(img[18]);
 
-	//setHealthBooster 
+	// setHealthBooster 
 	extern void setHealthBooster(Image img); 
 	setHealthBooster(img[19]);
 
+	// set tree position
+	extern void setTreePos(Image);
+	setTreePos(img[20]);
+	
 	//Initialize matrices
     glMatrixMode(GL_PROJECTION); glLoadIdentity();
     glMatrixMode(GL_MODELVIEW); glLoadIdentity();
@@ -861,7 +866,11 @@ void render(void)
 
 	 extern void showBackSet(int x, int y, GLuint txt);
      showBackSet(400,300,gl.backsetTexture);
-		
+
+
+	 //makeTransparent(&gl.treeTexture, &img[20]);
+ 	 /*extern void insertTree(int, int, GLuint);
+	 insertTree(400,300, gl.treeTexture);	 */
 	
 	 //makeTransparent(&gl.healthBoosterTexture, &img[19]);
 	 //extern void appendHealthBooster(int, int, GLuint); 

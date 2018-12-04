@@ -38,3 +38,12 @@ public:
 private:
 };
 
+
+class Heart { 
+public:
+	int posx, posy;
+	GLuint texid;
+	Heart(int, int, GLuint);
+	void render();
+	void physics();
+};
