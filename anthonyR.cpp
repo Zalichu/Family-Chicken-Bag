@@ -654,7 +654,7 @@ void renderLevel2() {
 					glPopMatrix();
 				}
 				if (lev2.arr[row][col] == 'g') {	
-					glColor3f(64, 64, 64);
+					glColor3f(0.2, 0.2, 0.2);
 					glPushMatrix();
 					glTranslated((Flt)j*dd+offx, (Flt)i*lev2.ftsz[1]+offy, 0);
 					glBegin(GL_QUADS);
