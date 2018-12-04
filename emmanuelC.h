@@ -104,6 +104,8 @@ public:
 	GLuint health2Texture;
 	GLuint groundTexture;
 	GLuint backsetTexture;
+	GLuint tileTexture;
+	GLuint healthBoosterTexture;
 	~Global();
 	Global();
 };

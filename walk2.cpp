@@ -28,7 +28,7 @@ extern Global gl;
 extern Level lev;
 extern X11_wrapper x11;
 
-Image img[18] = {
+Image img[20] = {
     "./images/walk.gif",
     "./images/exp.png",
     "./images/exp44.png",
@@ -46,7 +46,9 @@ Image img[18] = {
 	"./images/death.gif",
 	"./images/ninjaStar.png",
 	"./images/health2.png",
-	"./images/background/ground.png"
+	"./images/background/ground.png",
+	"./images/objects/tile.png",
+	"./images/objects/heart.png"
 };
 
 Image backgroundImg[3] = {
@@ -333,6 +335,14 @@ void initOpengl(void)
 	//backset
 	extern void setBackset(Image);
 	setBackset(backgroundImg[2]);
+
+	//tile set
+	extern void setTile(Image); 
+	setTile(img[18]);
+
+	//setHealthBooster 
+	extern void setHealthBooster(Image img); 
+	setHealthBooster(img[19]);
 
 	//Initialize matrices
     glMatrixMode(GL_PROJECTION); glLoadIdentity();
@@ -761,7 +771,7 @@ void render(void)
     }
 
 		
-
+	 
     //Clear the screen
     glClearColor(0.1, 0.1, 0.1, 1.0);
 	
@@ -851,12 +861,15 @@ void render(void)
 
 	 extern void showBackSet(int x, int y, GLuint txt);
      showBackSet(400,300,gl.backsetTexture);
+		
+	
+	 //makeTransparent(&gl.healthBoosterTexture, &img[19]);
+	 //extern void appendHealthBooster(int, int, GLuint); 
+	 //appendHealthBooster(400, 300, gl.healthBoosterTexture);
 
-
-
-	makeTransparent(&gl.groundTexture, &img[17]);
-	extern void appendGround(int x, int y, GLuint txt);
-        appendGround(400,300,gl.groundTexture);
+	 makeTransparent(&gl.groundTexture, &img[17]);
+	 extern void appendGround(int x, int y, GLuint txt);
+     appendGround(400,300,gl.groundTexture);
 
     //show boxes as background
     /*for (int i=0; i<20; i++) {
@@ -893,11 +906,13 @@ void render(void)
     //offx: the offset to the left of the screen to start drawing tiles
     Flt offx = -dec * dd;
     //Log("gl.camera[0]: %lf   offx: %lf\n",gl.camera[0],offx);
+	//extern void appendTile(int,int,GLuint);
+	//appendTile(300, 400, gl.tileTexture);
     for (int j=0; j<ncols_to_render; j++) {
         int row = lev.nrows-1;
         for (int i=0; i<lev.nrows; i++) {
             if (lev.arr[row][col] == 'w') {
-                glColor3f(0.8, 0.8, 0.6);
+                /*glColor3f(0.8, 0.8, 0.6);
                 glPushMatrix();
                 //put tile in its place
                 glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
@@ -907,11 +922,11 @@ void render(void)
                 glVertex2i(tx, ty);
                 glVertex2i(tx,  0);
                 glEnd();
-                glPopMatrix();
+                glPopMatrix();*/
 		//cout << "\nbrown tile pos-> x: " << j*dd+offx << " y: " << i*lev.ftsz[1]+offy << endl;
             }
             if (lev.arr[row][col] == 'b') {
-                glColor3f(0.9, 0.2, 0.2);
+                /*glColor3f(0.9, 0.2, 0.2);
                 glPushMatrix();
                 glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
                 glBegin(GL_QUADS);
@@ -920,7 +935,7 @@ void render(void)
                 glVertex2i(tx, ty);
                 glVertex2i(tx,  0);
                 glEnd();
-                glPopMatrix();
+                glPopMatrix();*/
 		//cout << "\nred tile pos-> x: " << j*dd+offx << " y: " << i*lev.ftsz[1]+offy << endl;
             }
             if (lev.arr[row][col] == 'r') {	
@@ -968,14 +983,14 @@ void render(void)
     glColor3f(1.0, 1.0, 0.1);
     glPushMatrix();
     //put ball in its place
-    glTranslated(gl.ball_pos[0], lev.tile_base+gl.ball_pos[1], 0);
+    /*glTranslated(gl.ball_pos[0], lev.tile_base+gl.ball_pos[1], 0);
     glBegin(GL_QUADS);
     glVertex2i(-10, 0);
     glVertex2i(-10, 20);
     glVertex2i( 10, 20);
     glVertex2i( 10, 0);
     glEnd();
-    glPopMatrix();
+    glPopMatrix();*/
     //--------------------------------------
 #ifdef SHOW_FAKE_SHADOW
     glColor3f(0.25, 0.25, 0.25);

@@ -201,4 +201,57 @@ void showBackSet(int x, int y, GLuint texid) {
  		 glPopMatrix();
 }
 
+void setTile(Image img) {
+	  glGenTextures(1, &gl.tileTexture);
+      int tileW = img.width;
+      int tileH = img.height;
+      glBindTexture(GL_TEXTURE_2D, gl.tileTexture);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+      glTexImage2D(GL_TEXTURE_2D,0,3,tileW,tileH,0, GL_RGB, GL_UNSIGNED_BYTE, img.data);
+      glViewport(0, 0, gl.xres, gl.yres);
+}
+
+void appendTile(int x, int y, GLuint texid) { 
+         glColor3ub(255, 255, 255);
+         int wid=50;
+         int hgt=80;
+         glPushMatrix();
+         glTranslatef(x, y, 0);
+         glBindTexture(GL_TEXTURE_2D, texid);
+         glBegin(GL_QUADS);
+              glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -hgt);
+              glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, hgt);
+              glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, hgt);
+              glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -hgt);
+         glEnd();
+ 		 glPopMatrix();
+}
+
+void setHealthBooster(Image img) {
+	  glGenTextures(1, &gl.healthBoosterTexture);
+      int boosterW = img.width;
+      int boosterH = img.height;
+      glBindTexture(GL_TEXTURE_2D, gl.healthBoosterTexture);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+      glTexImage2D(GL_TEXTURE_2D,0,3,boosterW,boosterH,0, GL_RGB, GL_UNSIGNED_BYTE, img.data);
+      glViewport(0, 0, gl.xres, gl.yres);
+}
+
+void appendHealthBooster(int x, int y, GLuint texid) { 
+         glColor3ub(255, 255, 255);
+         int wid=400;
+         int hgt=300;
+         glPushMatrix();
+         glTranslatef(x, y, 0);
+         glBindTexture(GL_TEXTURE_2D, texid);
+         glBegin(GL_QUADS);
+              glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid, -hgt);
+              glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, hgt);
+              glTexCoord2f(1.0f, 0.0f); glVertex2i(wid, hgt);
+              glTexCoord2f(1.0f, 1.0f); glVertex2i(wid, -hgt);
+         glEnd();
+ 		 glPopMatrix();
+}
 
