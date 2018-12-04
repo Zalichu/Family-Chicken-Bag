@@ -24,7 +24,7 @@ extern int enemy1xPos;
 extern Enemy enemy1;
 extern int locationX;
 extern Global gl;
-//extern float gcy;
+extern float gcy;
 
 static int playerScore = 0;
 int currentLevel = 1;
@@ -353,14 +353,13 @@ void Collision::Check_For_Hit()
 	}		
 }
 
-void Spike::Within_Range(int x, int y, Peter &peter) 
+void Spike::Within_Range(int x, Peter &peter) 
 {
-	if (x > xHitBoxLEFT && x < xHitBoxRIGHT) {
-		//if (y > yHitBoxBOTTOM && y < yHitBoxTOP) {
-		x+=y;
+	if (x > xHitBoxLEFT+20 && x < xHitBoxRIGHT-20) {
+		if (gcy<430) {
 		peter.health = 0;
-		std::cout << " - Peter be dead \n";
-		//}
+		//std::cout << " - Peter be dead \n";
+		}
 	}
 }
 
@@ -385,16 +384,18 @@ void enemyHealth_and_star()
 	//Show Enemies 
 	if (enemy1.showImage == true) {
 		showImage(enemy1.x, enemy1.y, 200, 200, gl.deathTexture);
-		showStar((enemy1.x - enemy1xPos++), enemy1.y, 100, 100, gl.ninjaStarTexture);	
+		showStar((enemy1.x - enemy1xPos++), enemy1.y-50, 100, 100, gl.ninjaStarTexture);
+		//std::cout << "enemy1.y: " << enemy1.y << endl;	
 		if ((enemy1.x-enemy1xPos) > peter.xHitBoxLEFT && (enemy1.x-enemy1xPos) < peter.xHitBoxRIGHT) {
-			peter.health -= 2;
+			if (gcy<345)
+				peter.health -= 20;
 			if (!peter.Alive()) {
 				std::cout << "he ded";
 			}
 		}
 		if (enemy1.x-enemy1xPos++ < 100) {
 			enemy1xPos=0;	
-			showStar((enemy1.x - enemy1xPos++), enemy1.y, 100, 100, gl.ninjaStarTexture);	
+			showStar((enemy1.x - enemy1xPos++), enemy1.y-50, 100, 100, gl.ninjaStarTexture);	
 		}
 	}
 }
@@ -405,11 +406,11 @@ void enemyHealth_and_star()
 void checkCollision()
 {
 	if (A.Within_Range(locationX)) {
-		std::cout << " - in range ";
+		//std::cout << " - in range ";
 		if (A.Punching(gl.punch) == true) {
-			std::cout << " - Dmg: " << A.Damage();
+			//std::cout << " - Dmg: " << A.Damage();
 			enemy1.health -= A.Damage();
-			std::cout << " - ENEMY HEALTH: " << enemy1.health;
+			//std::cout << " - ENEMY HEALTH: " << enemy1.health;
 			A.restrict = false;
 		}
 	}
@@ -457,18 +458,19 @@ void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j,
 
 void Peter::Jump(float &gcy) 
 {
+	std::cout << "Peter Y: " << gcy << std::endl;
 	if (gcy > 500) {
-		std::cout << "False\n";
+		//std::cout << "False\n";
 		gl.jumping = false;
 	}
 	if (!gl.jumping) {
-		std::cout << "Falling\n";
+		//std::cout << "Falling\n";
 		if (gcy>=300)
-			gcy-=10;
+			gcy-=8;
 	}
 	if (gl.jumping) {
-		std::cout << "True\n";
-		gcy+=10;
+		//std::cout << "True\n";
+		gcy+=8;
 	}
 }
 
@@ -482,9 +484,7 @@ void createSpike(char eLetter, Spike &spikeA, int i, int j,
 		int SlocationY = (Flt)i*lev.ftsz[1]+offy;
 		//std::cout << "SpikeX: " << SlocationX << " - ";
 		//std::cout << "SpikeY: " << SlocationY;
-
-		spikeA.Within_Range(SlocationX, SlocationY, peter);
-
+		spikeA.Within_Range(SlocationX, peter);
 		showImage(SlocationX, SlocationY, 150, 150, gl.spikeTexture);
 	}
 }

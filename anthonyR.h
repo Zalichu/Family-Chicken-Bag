@@ -89,7 +89,7 @@ public:
 		yHitBoxTOP = 0;
 	}
 	bool Spike_Collision();
-	void Within_Range(int x, int y, Peter &peter);
+	void Within_Range(int x, Peter &peter);
 };
 
 class Death {
