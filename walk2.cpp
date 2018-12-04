@@ -27,29 +27,34 @@ extern Global gl;
 extern Level lev;
 extern X11_wrapper x11;
 
-Image img[17] = {
-	"./images/walk.gif",
-	"./images/exp.png",
-	"./images/exp44.png",
-	"./images/tiger.jpg",
-	"./images/subaru.jpg",
-	"./images/dog.jpg",
-	"./images/KFC.png",
-	"./images/anthony.jpg",
-	"./images/objects/HealthBarUI.png",
-	"./images/objects/health.png",
-	"./images/objects/arrowKeys.png",
-	"./images/FCBTitle.png",
-	"./images/FCBEnd.png",	    
+Image img[21] = {
+    "./images/walk.gif",
+    "./images/exp.png",
+    "./images/exp44.png",
+    "./images/tiger.jpg",
+    "./images/subaru.jpg",
+    "./images/dog.jpg",
+    "./images/KFC.png",
+    "./images/anthony.jpg",
+    "./images/objects/HealthBarUI.png",
+    "./images/objects/health.png",
+    "./images/objects/arrowKeys.png",
+    "./images/FCBTitle.png",
+    "./images/FCBEnd.png",	    
 	"./images/spike.png",
 	"./images/death.gif",
 	"./images/ninjaStar.png",
-	"./images/health2.png"
+	"./images/health2.png",
+	"./images/background/ground.png",
+	"./images/objects/tile.png",
+	"./images/objects/heart.png",
+	"./images/background/tree.png"
 };
 
-Image backgroundImg[2] = {
-	"./images/background/clam-parking.jpg",
-	"./images/background/background.png"
+Image backgroundImg[3] = {
+    "./images/background/clam-parking.jpg",
+	"./images/background/background.png",
+    "./images/background/clam-noparking.gif"
 };
 
 typedef double Flt;
@@ -269,7 +274,6 @@ void initOpengl(void)
 	glViewport(0, 0, gl.xres, gl.yres);
 
 	//Initialize matrices
-
 	//Spike 	
 	glGenTextures(1, &gl.spikeTexture);
 	int SimageW = img[13].width; 
@@ -305,15 +309,44 @@ void initOpengl(void)
 	makeTransparent(&gl.deathTexture, &img[14]);
 
 	//Health v.2	
-	glGenTextures(1, &gl.health2Texture);
-	int H2imageW = img[16].width; 
-	int H2imageH = img[16].height; 
-	glBindTexture(GL_TEXTURE_2D, gl.health2Texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D,0,3,H2imageW,H2imageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[16].data);
-	glViewport(0, 0, gl.xres, gl.yres);
+    glGenTextures(1, &gl.health2Texture);
+    int H2imageW = img[16].width; 
+    int H2imageH = img[16].height; 
+    glBindTexture(GL_TEXTURE_2D, gl.health2Texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D,0,3,H2imageW,H2imageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[16].data);
+    glViewport(0, 0, gl.xres, gl.yres);
 
+
+
+	//ground tile
+    glGenTextures(1, &gl.groundTexture);
+    int groundW = img[17].width; 
+    int groundH = img[17].height; 
+    glBindTexture(GL_TEXTURE_2D, gl.groundTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D,0,3,groundW,groundH,0, GL_RGB, GL_UNSIGNED_BYTE, img[17].data);
+    glViewport(0, 0, gl.xres, gl.yres);
+
+
+	// backset
+	extern void setBackset(Image);
+	setBackset(backgroundImg[2]);
+
+	// tile set
+	extern void setTile(Image); 
+	setTile(img[18]);
+
+	// setHealthBooster 
+	extern void setHealthBooster(Image img); 
+	setHealthBooster(img[19]);
+
+	// set tree position
+	extern void setTreePos(Image);
+	setTreePos(img[20]);
+	
 	//Initialize matrices
 	glMatrixMode(GL_PROJECTION); glLoadIdentity();
 	glMatrixMode(GL_MODELVIEW); glLoadIdentity();

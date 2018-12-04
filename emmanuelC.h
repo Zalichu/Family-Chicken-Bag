@@ -2,6 +2,7 @@
 #ifndef emmanuelC_H
 #define emmanuelC_H
 
+#include <vector>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -102,6 +103,11 @@ public:
 	GLuint deathTexture;
 	GLuint ninjaStarTexture;
 	GLuint health2Texture;
+	GLuint groundTexture;
+	GLuint backsetTexture;
+	GLuint tileTexture;
+	GLuint healthBoosterTexture;
+	GLuint treeTexture;
 	~Global();
 	Global();
 };
@@ -113,8 +119,8 @@ public:
 	int tilesize[2];
 	Flt ftsz[2];
 	Flt tile_base;
-
-    	Level();
+	//vector<Heart> heart;
+    Level();
 	void removeCrLf(char *str);
 };
 

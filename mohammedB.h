@@ -1,4 +1,5 @@
 #include "emmanuelC.h"
+extern Image *grndImg;
 
 class Tile {
 public:
@@ -24,11 +25,25 @@ public:
         int width;
         int height;
         int xCord, yCord;
-        Image *img;
+        Image grndImg[1] = {
+	    "./images/background/ground.png"
+	};;
         GLuint groundTexture;
-        Ground(int, int);
+        Ground();
+		void appendGround(GLuint *texId, Image img);
+		void drawGround();
         void render();
         void physics();
         ~Ground();
 private:
+};
+
+
+class Heart { 
+public:
+	int posx, posy;
+	GLuint texid;
+	Heart(int, int, GLuint);
+	void render();
+	void physics();
 };
