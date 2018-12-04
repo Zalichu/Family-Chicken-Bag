@@ -92,7 +92,7 @@ void createSpike(char eLetter, Spike &spikeA, int i, int j,
 extern void makeTransparent(GLuint *tex, Image *img);
 extern void showImage(int,int,int,int,GLuint);	
 extern void showStar(int,int,int,int,GLuint);	
-float gcy;
+float gcy = 300;
 float gcx;
 int enemy1xPos = enemy1.x;
 
@@ -557,6 +557,8 @@ int checkKeys(XEvent *e)
         case XK_Right:
             break;
         case XK_Up:
+			if (gcy < 320) 
+				gl.jumping = true;
             break;
         case XK_Down:
             break;
@@ -789,10 +791,9 @@ void render(void)
     }
 
     glClear(GL_COLOR_BUFFER_BIT);
+	peter.Jump(gcy);
     float cx = gl.xres/2.0;
-    float cy = gl.yres/2.0;
-	gcx = cx;
-	gcy = cy;
+    float cy = gcy;//gl.yres/2.0;
     //
     //show ground
     int xCord = gl.xres;

@@ -67,6 +67,7 @@ Global::Global() {
     End = false;
 	showDeath = true;
 	 Title = true;
+	jumping = false;
     menu = false;
     credits = 0;
     background= false;

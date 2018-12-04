@@ -29,6 +29,7 @@ public:
 	}
 	void getPeterPos();
 	bool Alive();
+	void Jump(float &);
 };
 
 class Collision {
@@ -123,19 +124,5 @@ public:
 	}
 };
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

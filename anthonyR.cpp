@@ -12,7 +12,6 @@
 #include "fonts.h"
 #include <GL/glx.h>
 #include "anthonyR.h"
-#include "global.h"
 #include <string>
 
 using namespace std;
@@ -24,6 +23,7 @@ extern Peter peter;
 extern Enemy enemy1;
 extern int locationX;
 extern Global gl;
+//extern float gcy;
 
 static int playerScore = 0;
 int currentLevel = 1;
@@ -432,6 +432,23 @@ void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j,
 				playerScore++;
 			enemyA.showImage = false; 
 		}
+	}
+}
+
+void Peter::Jump(float &gcy) 
+{
+	if (gcy > 500) {
+		std::cout << "False\n";
+		gl.jumping = false;
+	}
+	if (!gl.jumping) {
+		std::cout << "Falling\n";
+		if (gcy>=300)
+			gcy-=10;
+	}
+	if (gl.jumping) {
+		std::cout << "True\n";
+		gcy+=10;
 	}
 }
 

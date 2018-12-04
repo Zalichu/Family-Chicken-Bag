@@ -72,7 +72,8 @@ public:
 	bool credits; //Added
 	bool menu; // Added
 	bool End; //Added
-	bool Title;
+	bool Title; //added
+	bool jumping; //added
 	bool background; // fixed background
 	char last_position;
 	Image *walkImage;
