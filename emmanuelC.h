@@ -101,7 +101,7 @@ public:
 	GLuint spikeTexture;
 	GLuint deathTexture;
 	GLuint ninjaStarTexture;
-
+	GLuint health2Texture;
 	~Global();
 	Global();
 };

@@ -25,7 +25,7 @@ public:
 		xHitBoxRIGHT = 500;
 		yHitBoxBOTTOM = 0;
 		yHitBoxTOP = 0;
-		health = 100;
+		health = 150;
 	}
 	void getPeterPos();
 	bool Alive();

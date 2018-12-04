@@ -28,7 +28,7 @@ extern Global gl;
 extern Level lev;
 extern X11_wrapper x11;
 
-Image img[16] = {
+Image img[17] = {
     "./images/walk.gif",
     "./images/exp.png",
     "./images/exp44.png",
@@ -44,7 +44,8 @@ Image img[16] = {
     "./images/FCBEnd.png",	    
 	"./images/spike.png",
 	"./images/death.gif",
-	"./images/ninjaStar.png"
+	"./images/ninjaStar.png",
+	"./images/health2.png"
 };
 
 Image backgroundImg[2] = {
@@ -87,7 +88,7 @@ void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j,
 						int tx, int ty, Flt dd, Flt offy, Flt offx,
 						int col, int row);
 void createSpike(char eLetter, Spike &spikeA, int i, int j, 
-						int tx, int ty, Flt dd, Flt offy, Flt offx,
+						Flt dd, Flt offy, Flt offx,
 						int col, int row);
 extern void makeTransparent(GLuint *tex, Image *img);
 extern void showImage(int,int,int,int,GLuint);	
@@ -243,8 +244,9 @@ void initOpengl(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D,0,3,keyimageW,keyimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[10].data);
     glViewport(0, 0, gl.xres, gl.yres);
-
-    //Title Screen
+	makeTransparent(&gl.keysTexture, &img[10]);
+    
+	//Title Screen
     glGenTextures(1, &gl.titleTexture);
     int TimageW = img[11].width; 
     int TimageH = img[11].height; 
@@ -299,7 +301,17 @@ void initOpengl(void)
     glTexImage2D(GL_TEXTURE_2D,0,3,DimageW,DimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[14].data);
     glViewport(0, 0, gl.xres, gl.yres);
 	makeTransparent(&gl.deathTexture, &img[14]);
-
+	
+	//Health v.2	
+    glGenTextures(1, &gl.health2Texture);
+    int H2imageW = img[16].width; 
+    int H2imageH = img[16].height; 
+    glBindTexture(GL_TEXTURE_2D, gl.health2Texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D,0,3,H2imageW,H2imageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[16].data);
+    glViewport(0, 0, gl.xres, gl.yres);
+	
 	//Initialize matrices
     glMatrixMode(GL_PROJECTION); glLoadIdentity();
     glMatrixMode(GL_MODELVIEW); glLoadIdentity();
@@ -792,6 +804,7 @@ void render(void)
 
     glClear(GL_COLOR_BUFFER_BIT);
 	peter.Jump(gcy);
+
     float cx = gl.xres/2.0;
     float cy = gcy;//gl.yres/2.0;
     //
@@ -914,7 +927,7 @@ void render(void)
     			showText(locationX, 80, colorFont("red"), " Enemy Health");
             }*/
 			
-			createSpike('s', spike1, i, j, tx, ty, dd, offy, offx, col, row);
+			createSpike('s', spike1, i, j, dd, offy, offx, col, row);
 			createEnemyHitbox('c', enemy1, i, j, tx, ty, dd, offy, offx, col, row);
             --row;
         }
@@ -993,12 +1006,12 @@ void render(void)
     //Show Health
 	//extern void peterHealth(int, int, int, Peter &peter);
 	//peterHealth(100, 500, 80, peter);
-    extern void showHealth(int, int, int, GLuint);
-    showHealth(100, 500, gl.playerHealth, gl.healthTexture);
-
+    //extern void showHealth(int, int, int, GLuint);
+    //showHealth(100, 500, gl.playerHealth, gl.healthTexture);
+	showImage(100,520,peter.health,20,gl.health2Texture);
     //Show Healthbar UI	
-    extern void showHealthbar(int, int, GLuint);
-    showHealthbar(100 ,500 ,gl.healthbarTexture);
+    //extern void showHealthbar(int, int, GLuint);
+    //showHealthbar(100 ,500 ,gl.healthbarTexture);
 
     //For Text Color
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -1019,25 +1032,12 @@ void render(void)
 	//std::cout << "peterX: " << peter.x;
 	makeTransparent(&gl.deathTexture, &img[14]);
 
-	//Show Enemies 
-	if (enemy1.showImage == true) {
-		showImage(enemy1.x, enemy1.y, 200, 200, gl.deathTexture);
-		showStar((enemy1.x - enemy1xPos++), enemy1.y, 100, 100, gl.ninjaStarTexture);	
-		if ((enemy1.x-enemy1xPos) > peter.xHitBoxLEFT && (enemy1.x-enemy1xPos) < peter.xHitBoxRIGHT) {
-			peter.health = 0;
-			if (!peter.Alive()) {
-				std::cout << "he ded";
-			}
-		}
-		if (enemy1.x-enemy1xPos++ < 100) {
-			enemy1xPos=0;	
-			showStar((enemy1.x - enemy1xPos++), enemy1.y, 100, 100, gl.ninjaStarTexture);	
-		}
-	}
 	if (enemy1.showImage == false) {
 		showImage(0,0,0,0,gl.deathTexture);
 		showStar(0,0,0,0,gl.ninjaStarTexture);
 	}
+	extern void enemyHealth_and_star();
+	enemyHealth_and_star();
 
 	//Collision
 	extern void checkCollision();
