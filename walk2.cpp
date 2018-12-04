@@ -96,6 +96,8 @@ extern void showStar(int,int,int,int,GLuint);
 float gcy = 300;
 float gcx;
 int enemy1xPos = enemy1.x;
+int theCurrentLevel = 0;
+int numOfLevels = 1;
 
 int main(void)
 {
@@ -903,7 +905,40 @@ void render(void)
                 glEnd();
                 glPopMatrix();
             }
-
+            if (lev.arr[row][col] == 'o') {	
+                glColor3f(255, 255, 255);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'l') {	
+                glColor3f(0, 0, 0);
+				int localX = (Flt)j*dd+offx;
+				if (localX > 410 && localX < 430) {
+					if (theCurrentLevel+1 == numOfLevels) {
+						while(1) {
+							std::cout << "GAME OVER\n";
+						}
+					}
+					theCurrentLevel++;
+					break;
+				}
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
 			/*extern void enemyHealth(int x, int y, int w, int h, Enemy &enemy1);
             if (lev.arr[row][col] == 'c') {
 				locationX = (Flt)j*dd+offx;
