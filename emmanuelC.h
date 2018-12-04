@@ -67,6 +67,7 @@ public:
 	int movie, movieStep;
 	int walk;
     int punch;
+    int cActive;
 	int walkFrame;
 	double delay;
 	bool showDeath; //added
@@ -79,7 +80,7 @@ public:
 	char last_position;
 	Image *walkImage;
 	GLuint walkTexture;
-	GLuint chicken;
+	GLuint chickenTexture;
 	int chickenFrame;
 	Vec box[20];
 	Sprite exp;
