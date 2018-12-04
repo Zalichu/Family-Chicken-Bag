@@ -88,7 +88,7 @@ void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j,
 						int tx, int ty, Flt dd, Flt offy, Flt offx,
 						int col, int row);
 void createSpike(char eLetter, Spike &spikeA, int i, int j, 
-						int tx, int ty, Flt dd, Flt offy, Flt offx,
+						Flt dd, Flt offy, Flt offx,
 						int col, int row);
 extern void makeTransparent(GLuint *tex, Image *img);
 extern void showImage(int,int,int,int,GLuint);	
@@ -244,8 +244,9 @@ void initOpengl(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D,0,3,keyimageW,keyimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[10].data);
     glViewport(0, 0, gl.xres, gl.yres);
-
-    //Title Screen
+	makeTransparent(&gl.keysTexture, &img[10]);
+    
+	//Title Screen
     glGenTextures(1, &gl.titleTexture);
     int TimageW = img[11].width; 
     int TimageH = img[11].height; 
@@ -925,7 +926,7 @@ void render(void)
     			showText(locationX, 80, colorFont("red"), " Enemy Health");
             }*/
 			
-			createSpike('s', spike1, i, j, tx, ty, dd, offy, offx, col, row);
+			createSpike('s', spike1, i, j, dd, offy, offx, col, row);
 			createEnemyHitbox('c', enemy1, i, j, tx, ty, dd, offy, offx, col, row);
             --row;
         }
