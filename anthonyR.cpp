@@ -28,7 +28,11 @@ extern float gcy;
 
 static int playerScore = 0;
 int currentLevel = 1;
+extern int theCurrentLevel;
+extern int numOfLevels;
 int enemy1Count = 0; //To keep count of how many points to give
+extern Spike spike1;
+Level2 lev2;
 
 int colorFont(string);
 void showText(int x, int y, int colorText, string text);
@@ -300,6 +304,7 @@ void Controls_UI(int x, int y) //WIP
 	glEnd();
 	glPopMatrix();	
 	string SplayerScore = to_string(playerScore);
+	currentLevel = 1 + theCurrentLevel;
 	string ScurrentLevel = to_string(currentLevel);
 	showText(x-52, y-90, colorFont("green"), ("SCORE: " + SplayerScore));
 	showText(x-52, y-110, colorFont("green"), ("Level: " + ScurrentLevel));
@@ -307,6 +312,50 @@ void Controls_UI(int x, int y) //WIP
 	showText(x-52, y-8, colorFont("yellow"), "+ | Speed Up");
 	showText(x-52, y-28, colorFont("yellow"), "- | Slow Down");
 	showText(x-52, y-48, colorFont("yellow"), "R | Punch");
+}
+
+Level2::Level2() {
+	tilesize[0] = 32;
+	tilesize[1] = 32;
+	ftsz[0] = (Flt)tilesize[0];
+	ftsz[1] = (Flt)tilesize[1];
+	tile_base = 220.0;
+	//read level
+	FILE *fpi = fopen("level2.txt","r");
+	if (fpi) {
+		nrows=0;
+		char line[100];
+		while (fgets(line, 100, fpi) != NULL) {
+			removeCrLf(line);
+			int slen = strlen(line);
+			ncols = slen;
+			//Log("line: %s\n", line);
+			for (int j=0; j<slen; j++) {
+				arr[nrows][j] = line[j];
+			}
+			++nrows;
+		}
+		fclose(fpi);
+		//printf("nrows of background data: %i\n", nrows);
+	}
+	for (int i=0; i<nrows; i++) {
+		for (int j=0; j<ncols; j++) {
+			printf("%c", arr[i][j]);
+		}
+		printf("\n");
+	}
+}
+
+void Level2::removeCrLf(char *str) {
+	//remove carriage return and linefeed from a Cstring
+	char *p = str;
+	while (*p) {
+		if (*p == 10 || *p == 13) {
+			*p = '\0';
+			break;
+		}
+		++p;
+	}
 }
 
 /*COLLISION FUNCTIONS  
@@ -356,9 +405,9 @@ void Collision::Check_For_Hit()
 void Spike::Within_Range(int x, Peter &peter) 
 {
 	if (x > xHitBoxLEFT+20 && x < xHitBoxRIGHT-20) {
-		if (gcy<430) {
-		peter.health = 0;
-		//std::cout << " - Peter be dead \n";
+		if (gcy<418) {
+			peter.health = 0;
+			//std::cout << " - Peter be dead \n";
 		}
 	}
 }
@@ -390,7 +439,7 @@ void enemyHealth_and_star()
 			if (gcy<345)
 				peter.health -= 20;
 			if (!peter.Alive()) {
-				std::cout << "he ded";
+				//std::cout << "he ded";
 			}
 		}
 		if (enemy1.x-enemy1xPos++ < 100) {
@@ -429,7 +478,7 @@ void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j,
 
 		enemyA.x = locationX;
 		enemyA.y = elocationY + 80;
-		std::cout << locationX;
+		//std::cout << locationX;
 
 		glColor3f(75, 0, 130);
 		glPushMatrix();
@@ -458,7 +507,7 @@ void createEnemyHitbox(char eLetter, Enemy &enemyA, int i, int j,
 
 void Peter::Jump(float &gcy) 
 {
-	std::cout << "Peter Y: " << gcy << std::endl;
+	//std::cout << "Peter Y: " << gcy << std::endl;
 	if (gcy > 500) {
 		//std::cout << "False\n";
 		gl.jumping = false;
@@ -536,4 +585,127 @@ int colorFont(string colorChoice)
 		return 0xffffff;
 	}
 	return 0x0ff0000; //Default's to red
+}
+
+//Ignore this::For ease of access
+void renderLevel2() {
+	if (theCurrentLevel==1) {
+		//========================
+		//Render the tile system
+		//========================
+		int tx = lev2.tilesize[0];
+		int ty = lev2.tilesize[1];
+		Flt dd = lev2.ftsz[0];
+		Flt offy = lev2.tile_base;
+		int ncols_to_render = gl.xres / lev2.tilesize[0] + 2;
+		int col = (int)(gl.camera[0] / dd);
+		col = col % lev2.ncols;
+		//Partial tile offset must be determined here.
+		//The leftmost tile might be partially off-screen.
+		//cdd: camera position in terms of tiles.
+		Flt cdd = gl.camera[0] / dd;
+		//flo: just the integer portion
+		Flt flo = floor(cdd);
+		//dec: just the decimal portion
+		Flt dec = (cdd - flo);
+		//offx: the offset to the left of the screen to start drawing tiles
+		Flt offx = -dec * dd;
+		//Log("gl.camera[0]: %lf   offx: %lf\n",gl.camera[0],offx);
+		for (int j=0; j<ncols_to_render; j++) {
+			int row = lev2.nrows-1;
+			for (int i=0; i<lev2.nrows; i++) {
+				if (lev2.arr[row][col] == 'w') {
+					glColor3f(0.8, 0.8, 0.6);
+					glPushMatrix();
+					//put tile in its place
+					glTranslated((Flt)j*dd+offx, (Flt)i*lev2.ftsz[1]+offy, 0);
+					glBegin(GL_QUADS);
+					glVertex2i( 0,  0);
+					glVertex2i( 0, ty);	
+					glVertex2i(tx, ty);
+					glVertex2i(tx,  0);
+					glEnd();
+					glPopMatrix();
+					//cout << "\nbrown tile pos-> x: " << j*dd+offx << " y: " << i*lev.ftsz[1]+offy << endl;
+				}
+				if (lev2.arr[row][col] == 'b') {
+					glColor3f(0.9, 0.2, 0.2);
+					glPushMatrix();
+					glTranslated((Flt)j*dd+offx, (Flt)i*lev2.ftsz[1]+offy, 0);
+					glBegin(GL_QUADS);
+					glVertex2i( 0,  0);
+					glVertex2i( 0, ty);
+					glVertex2i(tx, ty);
+					glVertex2i(tx,  0);
+					glEnd();
+					glPopMatrix();
+					//cout << "\nred tile pos-> x: " << j*dd+offx << " y: " << i*lev.ftsz[1]+offy << endl;
+				}
+				if (lev2.arr[row][col] == 'r') {	
+					glColor3f(75, 0, 130);
+					glPushMatrix();
+					glTranslated((Flt)j*dd+offx, (Flt)i*lev2.ftsz[1]+offy, 0);
+					glBegin(GL_QUADS);
+					glVertex2i( 0,  0);
+					glVertex2i( 0, ty);
+					glVertex2i(tx, ty);
+					glVertex2i(tx,  0);
+					glEnd();
+					glPopMatrix();
+				}
+				if (lev2.arr[row][col] == 'g') {	
+					glColor3f(64, 64, 64);
+					glPushMatrix();
+					glTranslated((Flt)j*dd+offx, (Flt)i*lev2.ftsz[1]+offy, 0);
+					glBegin(GL_QUADS);
+					glVertex2i( 0,  0);
+					glVertex2i( 0, ty);
+					glVertex2i(tx, ty);
+					glVertex2i(tx,  0);
+					glEnd();
+					glPopMatrix();
+				}
+				if (lev2.arr[row][col] == 'o') {	
+					glColor3f(255, 255, 255);
+					glPushMatrix();
+					glTranslated((Flt)j*dd+offx, (Flt)i*lev2.ftsz[1]+offy, 0);
+					glBegin(GL_QUADS);
+					glVertex2i( 0,  0);
+					glVertex2i( 0, ty);
+					glVertex2i(tx, ty);
+					glVertex2i(tx,  0);
+					glEnd();
+					glPopMatrix();
+				}
+				if (lev2.arr[row][col] == 'l') {	
+					glColor3f(0, 0, 0);
+					int localX = (Flt)j*dd+offx;
+					if (localX > 410 && localX < 430) {
+						if (theCurrentLevel+1 == numOfLevels) {
+							while(1) {
+								//void showEndPic(int x, int y, GLuint texid);
+								//showEndPic(800,600,gl.endTexture);
+								std::cout << "VICTORY\n";
+							}
+						}
+						theCurrentLevel++;
+						break;
+					}
+					glPushMatrix();
+					glTranslated((Flt)j*dd+offx, (Flt)i*lev2.ftsz[1]+offy, 0);
+					glBegin(GL_QUADS);
+					glVertex2i( 0,  0);
+					glVertex2i( 0, ty);
+					glVertex2i(tx, ty);
+					glVertex2i(tx,  0);
+					glEnd();
+					glPopMatrix();
+				}
+				createSpike('s', spike1, i, j, dd, offy, offx, col, row);
+				createEnemyHitbox('c', enemy1, i, j, tx, ty, dd, offy, offx, col, row);
+				--row;
+			}
+			col = (col+1) % lev2.ncols;
+		} 
+	}
 }

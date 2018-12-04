@@ -63,7 +63,7 @@ void showTitlePic(int x, int y, GLuint texid) {
 
 void showEndPic(int x, int y, GLuint texid) {
 	if (peter.health <= 0) {
-		std::cout << "Player H: " << peter.health << std::endl;
+		//std::cout << "Player H: " << peter.health << std::endl;
 		glColor3ub(255, 255, 255);
 		int wid=400;
 		int hgt=300;
