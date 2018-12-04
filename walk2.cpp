@@ -28,7 +28,7 @@ extern Global gl;
 extern Level lev;
 extern X11_wrapper x11;
 
-Image img[17] = {
+Image img[18] = {
     "./images/walk.gif",
     "./images/exp.png",
     "./images/exp44.png",
@@ -45,12 +45,14 @@ Image img[17] = {
 	"./images/spike.png",
 	"./images/death.gif",
 	"./images/ninjaStar.png",
-	"./images/health2.png"
+	"./images/health2.png",
+	"./images/background/ground.png"
 };
 
-Image backgroundImg[2] = {
+Image backgroundImg[3] = {
     "./images/background/clam-parking.jpg",
-    "./images/background/clam-noparking.gif"
+    "./images/background/clam-noparking.gif",
+	"./images/background/background.png"
 };
 
 typedef double Flt;
@@ -266,6 +268,9 @@ void initOpengl(void)
     glTexImage2D(GL_TEXTURE_2D,0,3,EimageW,EimageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[12].data);
     glViewport(0, 0, gl.xres, gl.yres);
 
+
+
+
     //Initialize matrices
 
 	//Spike 	
@@ -311,7 +316,24 @@ void initOpengl(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D,0,3,H2imageW,H2imageH,0, GL_RGB, GL_UNSIGNED_BYTE, img[16].data);
     glViewport(0, 0, gl.xres, gl.yres);
-	
+
+
+
+	//ground tile
+    glGenTextures(1, &gl.groundTexture);
+    int groundW = img[17].width; 
+    int groundH = img[17].height; 
+    glBindTexture(GL_TEXTURE_2D, gl.groundTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D,0,3,groundW,groundH,0, GL_RGB, GL_UNSIGNED_BYTE, img[17].data);
+    glViewport(0, 0, gl.xres, gl.yres);
+
+
+	//backset
+	extern void setBackset(Image);
+	setBackset(backgroundImg[2]);
+
 	//Initialize matrices
     glMatrixMode(GL_PROJECTION); glLoadIdentity();
     glMatrixMode(GL_MODELVIEW); glLoadIdentity();
@@ -738,9 +760,11 @@ void render(void)
     	return;
     }
 
+		
+
     //Clear the screen
     glClearColor(0.1, 0.1, 0.1, 1.0);
-
+	
     while (gl.menu) {
         glClearColor(0.1, 0.1, 0.1, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -809,9 +833,9 @@ void render(void)
     float cy = gcy;//gl.yres/2.0;
     //
     //show ground
-    int xCord = gl.xres;
-    int yCord = 220;
-    extern Ground ground(int, int);
+    //int xCord = gl.xres;
+    //int yCord = 220;
+    //extern Ground ground(int, int);
     //ground(xCord, yCord);
     //Ground ground(xCord, yCord);
     //ground.render();
@@ -825,9 +849,17 @@ void render(void)
     glEnd();
     */
 
+	 extern void showBackSet(int x, int y, GLuint txt);
+     showBackSet(400,300,gl.backsetTexture);
+
+
+
+	makeTransparent(&gl.groundTexture, &img[17]);
+	extern void appendGround(int x, int y, GLuint txt);
+        appendGround(400,300,gl.groundTexture);
 
     //show boxes as background
-    for (int i=0; i<20; i++) {
+    /*for (int i=0; i<20; i++) {
         glPushMatrix();
         glTranslated(gl.box[i][0],gl.box[i][1],gl.box[i][2]);
         glColor3f(0.2, 0.2, 0.2);
@@ -838,7 +870,7 @@ void render(void)
         glVertex2i(20,  0);
         glEnd();
         glPopMatrix();
-    } 
+    } */
 
     //========================
     //Render the tile system
@@ -1055,7 +1087,9 @@ void render(void)
         ggprint8b(&r, 16, c, "right arrow -> walk right");
         ggprint8b(&r, 16, c, "left arrow  <- walk left");
         ggprint8b(&r, 16, c, "frame: %i", gl.walkFrame); */
-    if (gl.movie) {
+    	
+	
+	if (gl.movie) {
         screenCapture();
     } 
 }
