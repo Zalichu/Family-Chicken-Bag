@@ -807,7 +807,7 @@ void render(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 	showImage(400,300,800,600,gl.backgroundTexture); 
 	
-	//show ground
+	//	show ground
 	glBegin(GL_QUADS);
 		glColor3f(0.2, 0.2, 0.2);
 		glVertex2i(0,       220);
@@ -816,7 +816,7 @@ void render(void)
 		glVertex2i(gl.xres,   0);
 		glVertex2i(0,         0);
 	glEnd();
-	//
+	
 	peter.Jump(gcy);
 
 	float cx = gl.xres/2.0;
