@@ -864,9 +864,9 @@ void render(void)
     glEnd();
     */
 
-	 extern void showBackSet(int x, int y, GLuint txt);
+	 /*extern void showBackSet(int x, int y, GLuint txt);
      showBackSet(400,300,gl.backsetTexture);
-
+*/
 
 	 //makeTransparent(&gl.treeTexture, &img[20]);
  	 /*extern void insertTree(int, int, GLuint);
@@ -876,12 +876,12 @@ void render(void)
 	 //extern void appendHealthBooster(int, int, GLuint); 
 	 //appendHealthBooster(400, 300, gl.healthBoosterTexture);
 
-	 makeTransparent(&gl.groundTexture, &img[17]);
+	 /*makeTransparent(&gl.groundTexture, &img[17]);
 	 extern void appendGround(int x, int y, GLuint txt);
-     appendGround(400,300,gl.groundTexture);
+     appendGround(400,300,gl.groundTexture);*/
 
     //show boxes as background
-    /*for (int i=0; i<20; i++) {
+    for (int i=0; i<20; i++) {
         glPushMatrix();
         glTranslated(gl.box[i][0],gl.box[i][1],gl.box[i][2]);
         glColor3f(0.2, 0.2, 0.2);
@@ -892,7 +892,7 @@ void render(void)
         glVertex2i(20,  0);
         glEnd();
         glPopMatrix();
-    } */
+    } 
 
     //========================
     //Render the tile system
@@ -921,7 +921,7 @@ void render(void)
         int row = lev.nrows-1;
         for (int i=0; i<lev.nrows; i++) {
             if (lev.arr[row][col] == 'w') {
-                /*glColor3f(0.8, 0.8, 0.6);
+                glColor3f(0.8, 0.8, 0.6);
                 glPushMatrix();
                 //put tile in its place
                 glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
@@ -931,11 +931,10 @@ void render(void)
                 glVertex2i(tx, ty);
                 glVertex2i(tx,  0);
                 glEnd();
-                glPopMatrix();*/
-		//cout << "\nbrown tile pos-> x: " << j*dd+offx << " y: " << i*lev.ftsz[1]+offy << endl;
+                glPopMatrix();
             }
             if (lev.arr[row][col] == 'b') {
-                /*glColor3f(0.9, 0.2, 0.2);
+                glColor3f(0.9, 0.2, 0.2);
                 glPushMatrix();
                 glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
                 glBegin(GL_QUADS);
@@ -944,8 +943,7 @@ void render(void)
                 glVertex2i(tx, ty);
                 glVertex2i(tx,  0);
                 glEnd();
-                glPopMatrix();*/
-		//cout << "\nred tile pos-> x: " << j*dd+offx << " y: " << i*lev.ftsz[1]+offy << endl;
+                glPopMatrix();
             }
             if (lev.arr[row][col] == 'r') {	
                 glColor3f(75, 0, 130);
